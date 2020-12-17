@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using WebApi.HealthChecks.Models;
+using AspNetStandard.Diagnostics.HealthChecks.Models;
 
-namespace WebApi.HealthChecks
+namespace AspNetStandard.Diagnostics.HealthChecks
 {
     public class HealthChecksBuilder
     {

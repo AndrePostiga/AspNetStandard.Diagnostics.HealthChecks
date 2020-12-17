@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace WebApi.HealthChecks
+namespace AspNetStandard.Diagnostics.HealthChecks
 {
     public interface IHealthCheck
     {

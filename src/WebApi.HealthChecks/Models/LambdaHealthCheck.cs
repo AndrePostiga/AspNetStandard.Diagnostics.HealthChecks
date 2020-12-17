@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace WebApi.HealthChecks.Models
+namespace AspNetStandard.Diagnostics.HealthChecks.Models
 {
     internal class LambdaHealthCheck : IHealthCheck
     {

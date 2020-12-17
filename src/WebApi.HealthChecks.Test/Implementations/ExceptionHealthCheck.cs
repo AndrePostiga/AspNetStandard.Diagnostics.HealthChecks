@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AspNetStandard.Diagnostics.HealthChecks;
 
 namespace WebApi.HealthChecks.Test.Implementations
 {

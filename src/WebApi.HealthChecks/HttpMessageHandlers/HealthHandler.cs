@@ -6,9 +6,9 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
-using WebApi.HealthChecks.Services;
+using AspNetStandard.Diagnostics.HealthChecks.Services;
 
-namespace WebApi.HealthChecks.HttpMessageHandlers
+namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
     internal class HealthHandler : HealthHandlerBase
     {

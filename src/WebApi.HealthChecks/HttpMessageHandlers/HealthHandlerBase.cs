@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using WebApi.HealthChecks.Models;
+using AspNetStandard.Diagnostics.HealthChecks.Models;
 
-namespace WebApi.HealthChecks.HttpMessageHandlers
+namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
     internal abstract class HealthHandlerBase : DelegatingHandler
     {

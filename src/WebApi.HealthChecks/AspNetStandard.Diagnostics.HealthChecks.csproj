@@ -3,17 +3,20 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Kirill Polishchuk</Authors>
+    <Authors>Kirill Polishchuk, Andre Postiga</Authors>
     <Company />
-    <Version>2.2.0</Version>
-    <PackageProjectUrl>https://github.com/kpol/WebApi.HealthChecks</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/kpol/WebApi.HealthChecks</RepositoryUrl>
+    <Version>2.2.0</Version>	
+    <PackageProjectUrl>https://github.com/AndrePostiga/WebApi.HealthChecks</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AndrePostiga/WebApi.HealthChecks</RepositoryUrl>
+	<Description>Project based on Kirill's and Kpol's project. Original project avaiable on GitHub Link: (https://github.com/kpol/WebApi.HealthChecks) and my new version: (https://github.com/AndrePostiga/WebApi.HealthChecks)</Description>
     <RepositoryType>Git</RepositoryType>
-    <PackageTags>web, web-api, health, health-check</PackageTags>
+    <PackageTags>web, web-api, health, health-check, aspnet-standard</PackageTags>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
-    <Title>WebApi.HealthChecks</Title>
+    <Title>AspNetStandard.Diagnostics.HealthChecks</Title>
     <Description>WebApi implementation of the health check endpoints for reporting the health of app infrastructure components.</Description>
     <FileVersion>1.0.0.0</FileVersion>
+    <AssemblyName>AspNetStandard.Diagnostics.HealthChecks</AssemblyName>
+    <RootNamespace>AspNetStandard.Diagnostics.HealthChecks</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

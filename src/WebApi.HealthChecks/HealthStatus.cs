@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace WebApi.HealthChecks
+namespace AspNetStandard.Diagnostics.HealthChecks
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum HealthStatus

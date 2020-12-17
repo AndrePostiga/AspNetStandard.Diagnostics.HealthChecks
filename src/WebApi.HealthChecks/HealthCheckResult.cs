@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace WebApi.HealthChecks
+namespace AspNetStandard.Diagnostics.HealthChecks
 {
     public class HealthCheckResult
     {

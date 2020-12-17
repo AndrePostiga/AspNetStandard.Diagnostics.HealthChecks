@@ -1,8 +1,8 @@
 ﻿using System.Web.Http;
-using WebApi.HealthChecks.HttpMessageHandlers;
-using WebApi.HealthChecks.Services;
+using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
+using AspNetStandard.Diagnostics.HealthChecks.Services;
 
-namespace WebApi.HealthChecks
+namespace AspNetStandard.Diagnostics.HealthChecks
 {
     public static class HttpConfigurationExtensions
     {

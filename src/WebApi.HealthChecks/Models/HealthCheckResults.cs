@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace WebApi.HealthChecks.Models
+namespace AspNetStandard.Diagnostics.HealthChecks.Models
 {
     internal class HealthCheckResults
     {

@@ -1,5 +1,4 @@
 using System;
-
 using Unity;
 using WebApi.HealthChecks.Test.Services;
 

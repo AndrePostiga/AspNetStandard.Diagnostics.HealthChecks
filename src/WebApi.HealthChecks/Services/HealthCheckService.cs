@@ -5,9 +5,9 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using WebApi.HealthChecks.Models;
+using AspNetStandard.Diagnostics.HealthChecks.Models;
 
-namespace WebApi.HealthChecks.Services
+namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
     internal class HealthCheckService
     {
