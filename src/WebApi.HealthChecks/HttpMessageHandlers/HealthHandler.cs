@@ -21,7 +21,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             CancellationToken cancellationToken)
         {
             var healthChecks = GetHealthChecks();
-            var service = new HealthCheckService(healthChecks, HealthChecksBuilder.ResultStatusCodes);
+            var service = new HealthCheckService(healthChecks, HealthChecksBuilder.ResultStatusCodes);            
 
             var queryParameters = request.GetQueryNameValuePairs()
                 .ToDictionary(kv => kv.Key, kv => kv.Value, StringComparer.OrdinalIgnoreCase);
@@ -47,8 +47,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
         {
             var response = new HttpResponseMessage(healthCheckService.GetStatusCode(healthStatus))
             {
-                Content = new ObjectContent<T>(objectContent,
-                    new JsonMediaTypeFormatter {SerializerSettings = SerializerSettings})
+                Content = new ObjectContent<T>(objectContent, new JsonMediaTypeFormatter {SerializerSettings = SerializerSettings})
             };
 
             AddWarningHeaderIfNeeded(response, healthStatus);

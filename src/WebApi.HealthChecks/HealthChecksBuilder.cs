@@ -7,21 +7,16 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 {
     public class HealthChecksBuilder
     {
-        internal HealthChecksBuilder()
+        internal HealthChecksBuilder() { }
+
+        internal IDictionary<HealthStatus, HttpStatusCode> ResultStatusCodes { get; } = new Dictionary<HealthStatus, HttpStatusCode>(3)
         {
+            {HealthStatus.Healthy, HttpStatusCode.OK},
+            {HealthStatus.Degraded, HttpStatusCode.OK},
+            {HealthStatus.Unhealthy, HttpStatusCode.ServiceUnavailable}
+        };
 
-        }
-
-        internal IDictionary<HealthStatus, HttpStatusCode> ResultStatusCodes { get; } =
-            new Dictionary<HealthStatus, HttpStatusCode>(3)
-            {
-                {HealthStatus.Healthy, HttpStatusCode.OK},
-                {HealthStatus.Degraded, HttpStatusCode.OK},
-                {HealthStatus.Unhealthy, HttpStatusCode.ServiceUnavailable}
-            };
-
-        internal IDictionary<string, Registration> HealthChecks { get; } =
-            new Dictionary<string, Registration>(StringComparer.OrdinalIgnoreCase);
+        internal IDictionary<string, Registration> HealthChecks { get; } = new Dictionary<string, Registration>(StringComparer.OrdinalIgnoreCase);
 
         internal bool AddWarningHeader { get; private set; } = true;
 
@@ -46,8 +41,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             return this;
         }
 
-        public HealthChecksBuilder OverrideResultStatusCodes(HttpStatusCode healthy = HttpStatusCode.OK,
-            HttpStatusCode degraded = HttpStatusCode.OK, HttpStatusCode unhealthy = HttpStatusCode.ServiceUnavailable)
+        public HealthChecksBuilder OverrideResultStatusCodes(HttpStatusCode healthy = HttpStatusCode.OK, HttpStatusCode degraded = HttpStatusCode.OK, HttpStatusCode unhealthy = HttpStatusCode.ServiceUnavailable)
         {
             ResultStatusCodes[HealthStatus.Healthy] = healthy;
             ResultStatusCodes[HealthStatus.Degraded] = degraded;

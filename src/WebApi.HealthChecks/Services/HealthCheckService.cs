@@ -25,12 +25,11 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
             return _resultStatusCodes[healthStatus];
         }
 
-        public async Task<HealthCheckResults> GetHealthAsync(
-            CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<HealthCheckResults> GetHealthAsync(CancellationToken cancellationToken = default)
         {
             var healthCheckResults = new HealthCheckResults();
 
-            var tasks = _healthChecks.Select(c => new {name = c.Key, result = c.Value.CheckHealthAsync()});
+            var tasks = _healthChecks.Select(c => new {name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
 
             var sw = new Stopwatch();
 
@@ -44,8 +43,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                     sw.Start();
                     var result = await task.result;
                     sw.Stop();
-                    healthCheckResults.Entries.Add(task.name,
-                        new HealthCheckResultExtended(result) {ResponseTime = sw.ElapsedMilliseconds});
+
+                    healthCheckResults.Entries.Add(task.name, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds});
                 }
                 catch (OperationCanceledException)
                 {
@@ -55,7 +54,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 {
                     healthCheckResults.Entries.Add(task.name,
                         new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
-                }
+                }                
             }
 
             var status = HealthStatus.Healthy;
@@ -90,13 +89,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
             try
             {
                 var sw = new Stopwatch();
-                sw.Start();
-
+                sw.Reset();
+                sw.Start();                
                 var result = await healthCheck.CheckHealthAsync();
 
                 sw.Stop();
 
-                return new HealthCheckResultExtended(result) {ResponseTime = sw.ElapsedMilliseconds};
+                return new HealthCheckResultExtended(result) {ResponseTime = sw.ElapsedMilliseconds };
             }
             catch
             {
