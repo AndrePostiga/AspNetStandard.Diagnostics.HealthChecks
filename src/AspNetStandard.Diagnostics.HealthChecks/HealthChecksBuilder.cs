@@ -56,5 +56,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 
             return this;
         }
+
+        internal string ApiKey = null;
+        public HealthChecksBuilder UseAuthorization(string apiKey)
+        {
+            ApiKey = apiKey;
+            return this;
+        }
     }
 }
