@@ -40,8 +40,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                 return GetResponse(healthResult, healthResult.Status, service);
             }
 
-            var result = await service.GetHealthAsync(cancellationToken);
-
+            var result = await service.GetHealthAsync(cancellationToken);              
+            
             return GetResponse(result, result.OverAllStatus, service);
         }
 

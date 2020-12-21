@@ -25,15 +25,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
         #region IHandler Implementation
 
-        protected IHandler _nextHandler;
-        public IHandler SetNextHandler(IHandler handler)
-        {
-            _nextHandler = handler;
-            return handler;
-        }
+        public abstract Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken);        
 
-        public abstract Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken);
-        
         #endregion
 
         #region DelegatingHandler Implementation

@@ -13,10 +13,20 @@ using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    class AuthenticationHandler : BaseHandler
+    class AuthenticationHandler : BaseHandler, IHasNextHandler
     {
+        
         public AuthenticationHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(httpConfiguration, healthChecksBuilder)
         {}
+
+        #region IHasNextHandle Implementation
+        private IHandler _nextHandler;
+        public IHandler SetNextHandler(IHandler nextHandlerInstance)
+        {
+            _nextHandler = nextHandlerInstance;
+            return nextHandlerInstance;
+        }
+        #endregion
 
         #region BaseHandler Implementation
         public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -41,7 +51,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
             return await _nextHandler.HandleRequest(request, cancellationToken);
         }
-
         #endregion
 
         #region Private Help Methods
