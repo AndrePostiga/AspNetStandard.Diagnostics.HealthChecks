@@ -125,7 +125,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WebApi.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj">
+    <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj">
       <Project>{8474be3a-e5b4-4e6b-a9bc-bdbf28466b52}</Project>
       <Name>AspNetStandard.Diagnostics.HealthChecks</Name>
     </ProjectReference>

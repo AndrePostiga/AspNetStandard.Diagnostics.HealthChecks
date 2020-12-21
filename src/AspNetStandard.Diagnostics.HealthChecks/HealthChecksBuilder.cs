@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using AspNetStandard.Diagnostics.HealthChecks.Models;
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {

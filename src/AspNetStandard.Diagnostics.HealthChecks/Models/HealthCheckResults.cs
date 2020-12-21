@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using Newtonsoft.Json;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Models

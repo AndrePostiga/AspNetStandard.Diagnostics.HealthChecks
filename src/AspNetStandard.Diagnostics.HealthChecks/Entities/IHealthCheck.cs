@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace AspNetStandard.Diagnostics.HealthChecks
+namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 {
     public interface IHealthCheck
     {

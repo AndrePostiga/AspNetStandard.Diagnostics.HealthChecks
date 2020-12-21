@@ -9,6 +9,7 @@ using System.Web.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using AspNetStandard.Diagnostics.HealthChecks.Models;
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {

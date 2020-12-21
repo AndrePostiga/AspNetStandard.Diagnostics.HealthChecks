@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace AspNetStandard.Diagnostics.HealthChecks
+namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 {
     public class HealthCheckResult
     {
@@ -10,14 +10,18 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             Status = status;
             Description = description;
             Exception = exception;
+            LastExecutionUtc = DateTime.UtcNow;
         }
 
         public HealthStatus Status { get; }
+
+        public DateTime LastExecutionUtc { get; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Description { get; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Exception Exception { get; }
+        
     }
 }

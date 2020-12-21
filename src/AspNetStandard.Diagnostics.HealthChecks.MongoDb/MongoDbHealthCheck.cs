@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using System.Threading;
-
-using MongoDB.Driver;
-using AspNetStandard.Diagnostics.HealthChecks;
 using System.Collections.Concurrent;
+using MongoDB.Driver;
+
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.MongoDb
 {

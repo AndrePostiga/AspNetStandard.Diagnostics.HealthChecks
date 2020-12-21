@@ -2,6 +2,7 @@
 using System.Web.Http;
 using WebApi.HealthChecks.Test.Implementations;
 using AspNetStandard.Diagnostics.HealthChecks;
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace WebApi.HealthChecks.Test
 {

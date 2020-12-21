@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetStandard.Diagnostics.HealthChecks.Models;
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
@@ -25,9 +25,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
             return _resultStatusCodes[healthStatus];
         }
 
-        public async Task<HealthCheckResults> GetHealthAsync(CancellationToken cancellationToken = default)
+        public async Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default)
         {
-            var healthCheckResults = new HealthCheckResults();
+            var healthCheckResults = new HealthCheckResponse();
 
             var tasks = _healthChecks.Select(c => new {name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
 
@@ -73,7 +73,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 }
             }
 
-            healthCheckResults.Status = status;
+            healthCheckResults.OverAllStatus = status;
             healthCheckResults.TotalResponseTime = healthCheckResults.Entries.Values.Sum(c => c.ResponseTime);
 
             return healthCheckResults;

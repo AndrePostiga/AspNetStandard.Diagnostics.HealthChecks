@@ -7,18 +7,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
     internal class HealthHandler : HealthHandlerBase
     {
-        public HealthHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(
-            httpConfiguration, healthChecksBuilder)
+        public HealthHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(httpConfiguration, healthChecksBuilder)
         {
         }
 
-        protected override async Task<HttpResponseMessage> GetResponseAsync(HttpRequestMessage request,
-            CancellationToken cancellationToken)
+        protected override async Task<HttpResponseMessage> GetResponseAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var healthChecks = GetHealthChecks();
             var service = new HealthCheckService(healthChecks, HealthChecksBuilder.ResultStatusCodes);            
@@ -40,7 +39,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
             var result = await service.GetHealthAsync(cancellationToken);
 
-            return GetResponse(result, result.Status, service);
+            return GetResponse(result, result.OverAllStatus, service);
         }
 
         private HttpResponseMessage GetResponse<T>(T objectContent, HealthStatus healthStatus, HealthCheckService healthCheckService)

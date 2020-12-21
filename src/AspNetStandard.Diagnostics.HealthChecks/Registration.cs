@@ -1,6 +1,8 @@
-﻿using System;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
+using System;
 
-namespace AspNetStandard.Diagnostics.HealthChecks.Models
+
+namespace AspNetStandard.Diagnostics.HealthChecks
 {
     internal class Registration
     {

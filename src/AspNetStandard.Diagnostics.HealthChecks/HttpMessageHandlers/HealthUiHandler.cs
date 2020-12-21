@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
@@ -46,7 +47,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             else
             {
                 var result = await service.GetHealthAsync(cancellationToken);
-                status = result.Status;
+                status = result.OverAllStatus;
             }
 
             return CreateResponse(status);

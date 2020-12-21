@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using WebApi.HealthChecks.Test.Services;
 using AspNetStandard.Diagnostics.HealthChecks;
+using System.Threading;
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace WebApi.HealthChecks.Test.Implementations
 {
@@ -13,7 +15,7 @@ namespace WebApi.HealthChecks.Test.Implementations
             _cosmosClient = cosmosClient;
         }
 
-        public async Task<HealthCheckResult> CheckHealthAsync()
+        public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
             return new HealthCheckResult(await _cosmosClient.Connect() ? HealthStatus.Healthy : HealthStatus.Degraded);
         }

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace AspNetStandard.Diagnostics.HealthChecks.Models
+namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 {
     internal class HealthCheckResultExtended : HealthCheckResult
     {
