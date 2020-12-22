@@ -1,5 +1,5 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 {
@@ -22,6 +22,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Exception Exception { get; }
-        
     }
 }

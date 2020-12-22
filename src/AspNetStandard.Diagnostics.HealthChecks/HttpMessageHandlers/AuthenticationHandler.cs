@@ -1,34 +1,33 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    class AuthenticationHandler : BaseHandler, IChainable
+    internal class AuthenticationHandler : BaseHandler, IChainable
     {
-        
         public AuthenticationHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(httpConfiguration, healthChecksBuilder)
-        {}
+        { }
 
         #region IChainable Implementation
+
         private IHandler _nextHandler;
+
         public IHandler SetNextHandler(IHandler nextHandlerInstance)
         {
             _nextHandler = nextHandlerInstance;
             return nextHandlerInstance;
         }
-        #endregion
+
+        #endregion IChainable Implementation
 
         #region BaseHandler Implementation
+
         public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (String.IsNullOrEmpty(HealthChecksBuilder.ApiKey))
@@ -46,14 +45,16 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                     )
                 };
 
-                return await Task.FromResult(response); 
+                return await Task.FromResult(response);
             }
 
             return await _nextHandler.HandleRequest(request, cancellationToken);
         }
-        #endregion
+
+        #endregion BaseHandler Implementation
 
         #region Private Help Methods
+
         private bool validateKey(HttpRequestMessage request)
         {
             var query = request.RequestUri.ParseQueryString();
@@ -61,6 +62,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             return (key == HealthChecksBuilder.ApiKey);
         }
 
-        #endregion
+        #endregion Private Help Methods
     }
 }

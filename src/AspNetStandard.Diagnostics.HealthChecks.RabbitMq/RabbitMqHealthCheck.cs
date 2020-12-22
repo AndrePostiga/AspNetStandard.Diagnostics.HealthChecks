@@ -19,6 +19,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
         {
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
         }
+
         public RabbitMqHealthCheck(IConnectionFactory factory)
         {
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
@@ -30,7 +31,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
             _sslOption = ssl;
         }
 
-        #endregion
+        #endregion ctor
 
         #region Interface Implementation
 
@@ -70,6 +71,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
             }
         }
 
-        #endregion
+        #endregion Interface Implementation
     }
 }

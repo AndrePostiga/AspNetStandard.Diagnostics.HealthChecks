@@ -1,11 +1,11 @@
-﻿using System;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
@@ -29,7 +29,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
         {
             var healthCheckResults = new HealthCheckResponse();
 
-            var tasks = _healthChecks.Select(c => new {name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
+            var tasks = _healthChecks.Select(c => new { name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
 
             var sw = new Stopwatch();
 
@@ -44,7 +44,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                     var result = await task.result;
                     sw.Stop();
 
-                    healthCheckResults.Entries.Add(task.name, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds});
+                    healthCheckResults.Entries.Add(task.name, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
                 }
                 catch (OperationCanceledException)
                 {
@@ -54,7 +54,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 {
                     healthCheckResults.Entries.Add(task.name,
                         new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
-                }                
+                }
             }
 
             var status = HealthStatus.Healthy;
@@ -90,12 +90,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
             {
                 var sw = new Stopwatch();
                 sw.Reset();
-                sw.Start();                
+                sw.Start();
                 var result = await healthCheck.CheckHealthAsync();
 
                 sw.Stop();
 
-                return new HealthCheckResultExtended(result) {ResponseTime = sw.ElapsedMilliseconds };
+                return new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds };
             }
             catch
             {

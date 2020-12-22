@@ -1,10 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Collections.Concurrent;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using MongoDB.Driver;
-
-using AspNetStandard.Diagnostics.HealthChecks.Entities;
+using System;
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.MongoDb
 {
@@ -25,14 +24,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.MongoDb
             }
         }
 
-
         public MongoDbHealthCheck(MongoClientSettings clientSettings, string dataBaseName = default)
         {
             _dataBaseName = dataBaseName;
             _mongoClientSettings = clientSettings;
         }
 
-        #endregion
+        #endregion ctor
 
         #region Interface Implementation
 
@@ -59,12 +57,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks.MongoDb
             }
             catch (Exception ex)
             {
-
                 return new HealthCheckResult(HealthStatus.Unhealthy, "MongoDb is unhealthy", exception: ex);
             }
         }
 
-        #endregion
-
+        #endregion Interface Implementation
     }
 }

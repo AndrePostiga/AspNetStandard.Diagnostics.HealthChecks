@@ -1,6 +1,5 @@
-﻿using System.Web.Http;
-using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
-using AspNetStandard.Diagnostics.HealthChecks.Services;
+﻿using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
+using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {

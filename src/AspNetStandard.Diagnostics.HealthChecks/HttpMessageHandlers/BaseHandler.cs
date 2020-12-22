@@ -1,20 +1,14 @@
-﻿using AspNetStandard.Diagnostics.HealthChecks.Models;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Formatting;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    abstract class BaseHandler : DelegatingHandler, IHandler
-    {        
+    internal abstract class BaseHandler : DelegatingHandler, IHandler
+    {
         protected JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
         protected BaseHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder)
@@ -25,11 +19,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
         #region IHandler Implementation
 
-        public abstract Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken);        
+        public abstract Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken);
 
-        #endregion
+        #endregion IHandler Implementation
 
         #region DelegatingHandler Implementation
+
         protected HealthChecksBuilder HealthChecksBuilder { get; }
 
         protected readonly HttpConfiguration _httpConfiguration;
@@ -43,9 +38,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             }
 
             //Problema está aqui, executa o send async assim que chama o handler
-            return await HandleRequest(request, cancellationToken);            
+            return await HandleRequest(request, cancellationToken);
         }
 
-        #endregion
+        #endregion DelegatingHandler Implementation
     }
 }

@@ -8,19 +8,20 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    class HealthCheckHandler : BaseHandler
+    internal class HealthCheckHandler : BaseHandler
     {
-
-        public HealthCheckHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(httpConfiguration, healthChecksBuilder) { }
+        public HealthCheckHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(httpConfiguration, healthChecksBuilder)
+        {
+        }
 
         #region BaseHandler Implementation
+
         public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var healthChecks = GetHealthChecks();
@@ -40,12 +41,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                 return GetResponse(healthResult, healthResult.Status, service);
             }
 
-            var result = await service.GetHealthAsync(cancellationToken);              
-            
+            var result = await service.GetHealthAsync(cancellationToken);
+
             return GetResponse(result, result.OverAllStatus, service);
         }
 
-        #endregion
+        #endregion BaseHandler Implementation
 
         #region Private Help Methods
 
@@ -84,6 +85,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                 return result;
             }
         }
+
         private HttpResponseMessage CheckNotFound(string check)
             => new HttpResponseMessage(HttpStatusCode.NotFound)
             {
@@ -109,6 +111,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             }
         }
 
-        #endregion
+        #endregion Private Help Methods
     }
 }

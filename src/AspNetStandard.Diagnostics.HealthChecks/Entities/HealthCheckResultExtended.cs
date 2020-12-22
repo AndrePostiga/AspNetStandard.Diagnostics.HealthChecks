@@ -7,7 +7,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         public HealthCheckResultExtended(HealthCheckResult healthCheckResult) :
             base(healthCheckResult.Status, healthCheckResult.Description, healthCheckResult.Exception)
         {
-
         }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]

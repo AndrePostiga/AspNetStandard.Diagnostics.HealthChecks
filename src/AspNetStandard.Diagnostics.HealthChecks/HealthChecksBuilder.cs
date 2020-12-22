@@ -1,13 +1,15 @@
-﻿using System;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
+using System;
 using System.Collections.Generic;
 using System.Net;
-using AspNetStandard.Diagnostics.HealthChecks.Entities;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {
     public class HealthChecksBuilder
     {
-        internal HealthChecksBuilder() { }
+        internal HealthChecksBuilder()
+        {
+        }
 
         internal IDictionary<HealthStatus, HttpStatusCode> ResultStatusCodes { get; } = new Dictionary<HealthStatus, HttpStatusCode>(3)
         {
@@ -58,6 +60,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
         }
 
         internal string ApiKey = null;
+
         public HealthChecksBuilder UseAuthorization(string apiKey)
         {
             ApiKey = apiKey;

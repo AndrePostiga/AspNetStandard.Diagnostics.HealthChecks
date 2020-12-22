@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
+﻿namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    interface IChainable
+    internal interface IChainable
     {
         IHandler SetNextHandler(IHandler nextHandlerInstance);
     }

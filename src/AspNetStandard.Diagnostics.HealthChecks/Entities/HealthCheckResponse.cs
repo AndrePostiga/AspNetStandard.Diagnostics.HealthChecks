@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 {
-    class HealthCheckResponse
+    internal class HealthCheckResponse
     {
-
         public HealthCheckResponse()
-        {            
+        {
             Entries = new Dictionary<string, HealthCheckResultExtended>();
         }
 
-        public HealthStatus OverAllStatus { get; set; }        
-        public long? TotalResponseTime { get; set; }        
-        public IDictionary<string, HealthCheckResultExtended> Entries { get; } 
+        public HealthStatus OverAllStatus { get; set; }
+        public long? TotalResponseTime { get; set; }
+        public IDictionary<string, HealthCheckResultExtended> Entries { get; }
     }
 }
