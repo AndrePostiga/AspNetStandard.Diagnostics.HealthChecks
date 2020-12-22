@@ -13,13 +13,13 @@ using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    class AuthenticationHandler : BaseHandler, IHasNextHandler
+    class AuthenticationHandler : BaseHandler, IChainable
     {
         
         public AuthenticationHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(httpConfiguration, healthChecksBuilder)
         {}
 
-        #region IHasNextHandle Implementation
+        #region IChainable Implementation
         private IHandler _nextHandler;
         public IHandler SetNextHandler(IHandler nextHandlerInstance)
         {

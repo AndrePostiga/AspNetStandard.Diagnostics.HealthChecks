@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    interface IHasNextHandler
+    interface IChainable
     {
         IHandler SetNextHandler(IHandler nextHandlerInstance);
     }
