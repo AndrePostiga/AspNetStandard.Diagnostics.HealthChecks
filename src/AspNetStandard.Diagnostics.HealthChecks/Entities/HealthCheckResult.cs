@@ -9,13 +9,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         {
             Status = status;
             Description = description;
-            Exception = exception;
-            LastExecutionUtc = DateTime.UtcNow;
+            Exception = exception;            
         }
 
-        public HealthStatus Status { get; }
-
-        public DateTime LastExecutionUtc { get; }
+        public HealthStatus Status { get; }        
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Description { get; }

@@ -9,7 +9,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
     internal abstract class BaseHandler : DelegatingHandler, IHandler
     {
-        protected JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+        protected JsonSerializerSettings SerializerSettings { get; } = 
+            new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
         protected BaseHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder)
         {
@@ -17,13 +18,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             HealthChecksBuilder = healthChecksBuilder;
         }
 
-        #region IHandler Implementation
-
         public abstract Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken);
-
-        #endregion IHandler Implementation
-
-        #region DelegatingHandler Implementation
 
         protected HealthChecksBuilder HealthChecksBuilder { get; }
 
@@ -40,7 +35,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             //Problema está aqui, executa o send async assim que chama o handler
             return await HandleRequest(request, cancellationToken);
         }
-
-        #endregion DelegatingHandler Implementation
     }
 }

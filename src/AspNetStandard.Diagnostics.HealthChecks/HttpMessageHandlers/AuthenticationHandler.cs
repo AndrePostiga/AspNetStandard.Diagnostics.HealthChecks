@@ -45,7 +45,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                     )
                 };
 
-                return await Task.FromResult(response);
+                return response;
             }
 
             return await _nextHandler.HandleRequest(request, cancellationToken);
@@ -57,6 +57,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
         private bool validateKey(HttpRequestMessage request)
         {
+            //query.TryGetValue
             var query = request.RequestUri.ParseQueryString();
             string key = query["ApiKey"];
             return (key == HealthChecksBuilder.ApiKey);

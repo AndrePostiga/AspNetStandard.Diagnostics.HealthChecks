@@ -40,7 +40,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.MongoDb
             {
                 var mongoClient = _mongoClient.GetOrAdd(_mongoClientSettings.ToString(), _ => new MongoClient(_mongoClientSettings));
 
-                if (!string.IsNullOrEmpty(_dataBaseName))
+                if (!string.IsNullOrWhiteSpace(_dataBaseName))
                 {
                     var cursor = await mongoClient.GetDatabase(_dataBaseName).ListCollectionNamesAsync(cancellationToken: cancellationToken);
                     await cursor.FirstOrDefaultAsync(cancellationToken);

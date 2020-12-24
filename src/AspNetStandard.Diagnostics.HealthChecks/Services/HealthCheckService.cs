@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+
+[assembly: InternalsVisibleTo("AspNetStandard.Diagnostics.HealthChecks.Tests")]
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
@@ -52,13 +55,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 }
                 catch
                 {
-                    healthCheckResults.Entries.Add(task.name,
-                        new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
+                    healthCheckResults.Entries.Add(task.name, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
                 }
             }
 
             var status = HealthStatus.Healthy;
 
+            //Extrair pra classe
             foreach (var healthCheckResultExtended in healthCheckResults.Entries.Values)
             {
                 if (healthCheckResultExtended.Status == HealthStatus.Unhealthy)
@@ -72,6 +75,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                     status = HealthStatus.Degraded;
                 }
             }
+            //Classe
 
             healthCheckResults.OverAllStatus = status;
             healthCheckResults.TotalResponseTime = healthCheckResults.Entries.Values.Sum(c => c.ResponseTime);

@@ -18,6 +18,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
     {
         public HealthCheckHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(httpConfiguration, healthChecksBuilder)
         {
+            //criar serviço aqui por injeção e uma interface pro serviço
         }
 
         #region BaseHandler Implementation
