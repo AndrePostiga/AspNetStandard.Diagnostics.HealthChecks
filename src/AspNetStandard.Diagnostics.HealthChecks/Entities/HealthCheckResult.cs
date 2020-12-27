@@ -9,10 +9,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         {
             Status = status;
             Description = description;
-            Exception = exception;            
+            Exception = exception;
         }
 
-        public HealthStatus Status { get; }        
+        public HealthStatus Status { get; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public string Description { get; }

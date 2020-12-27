@@ -21,8 +21,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             //criar serviço aqui por injeção e uma interface pro serviço
         }
 
-        #region BaseHandler Implementation
-
         public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             var healthChecks = GetHealthChecks();
@@ -46,10 +44,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
             return GetResponse(result, result.OverAllStatus, service);
         }
-
-        #endregion BaseHandler Implementation
-
-        #region Private Help Methods
 
         private HttpResponseMessage GetResponse<T>(T objectContent, HealthStatus healthStatus, HealthCheckService healthCheckService)
         {
@@ -111,7 +105,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                 }
             }
         }
-
-        #endregion Private Help Methods
     }
 }

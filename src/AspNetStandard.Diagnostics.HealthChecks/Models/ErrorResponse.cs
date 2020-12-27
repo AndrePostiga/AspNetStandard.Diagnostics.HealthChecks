@@ -3,5 +3,7 @@
     internal class ErrorResponse
     {
         public string Error { get; set; }
+
+        public string soNaBranch;
     }
 }

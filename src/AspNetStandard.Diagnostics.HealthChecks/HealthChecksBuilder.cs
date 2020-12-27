@@ -7,9 +7,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 {
     public class HealthChecksBuilder
     {
-        internal HealthChecksBuilder()
-        {
-        }
+        internal HealthChecksBuilder() { }
 
         internal IDictionary<HealthStatus, HttpStatusCode> ResultStatusCodes { get; } = new Dictionary<HealthStatus, HttpStatusCode>(3)
         {

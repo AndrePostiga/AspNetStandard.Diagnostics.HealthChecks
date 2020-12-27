@@ -9,7 +9,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
     internal abstract class BaseHandler : DelegatingHandler, IHandler
     {
-        protected JsonSerializerSettings SerializerSettings { get; } = 
+        protected JsonSerializerSettings SerializerSettings { get; } =
             new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
         protected BaseHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder)

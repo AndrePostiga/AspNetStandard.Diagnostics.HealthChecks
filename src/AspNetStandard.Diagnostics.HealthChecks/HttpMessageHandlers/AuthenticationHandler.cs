@@ -14,8 +14,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
         public AuthenticationHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(httpConfiguration, healthChecksBuilder)
         { }
 
-        #region IChainable Implementation
-
         private IHandler _nextHandler;
 
         public IHandler SetNextHandler(IHandler nextHandlerInstance)
@@ -23,10 +21,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             _nextHandler = nextHandlerInstance;
             return nextHandlerInstance;
         }
-
-        #endregion IChainable Implementation
-
-        #region BaseHandler Implementation
 
         public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -51,10 +45,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             return await _nextHandler.HandleRequest(request, cancellationToken);
         }
 
-        #endregion BaseHandler Implementation
-
-        #region Private Help Methods
-
         private bool validateKey(HttpRequestMessage request)
         {
             //query.TryGetValue
@@ -62,7 +52,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             string key = query["ApiKey"];
             return (key == HealthChecksBuilder.ApiKey);
         }
-
-        #endregion Private Help Methods
     }
 }
