@@ -1,20 +1,21 @@
-﻿using AspNetStandard.Diagnostics.HealthChecks.Models;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Errors;
+using AspNetStandard.Diagnostics.HealthChecks.Services;
 using System;
-using System.Net;
 using System.Net.Http;
-using System.Net.Http.Formatting;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    internal class AuthenticationHandler : BaseHandler, IChainable
+    internal class AuthenticationHandler : Handler, IChainable
     {
-        public AuthenticationHandler(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder) : base(httpConfiguration, healthChecksBuilder)
-        { }
-
         private IHandler _nextHandler;
+        private readonly IAuthenticationService _authService;
+
+        public AuthenticationHandler(IAuthenticationService service)
+        {
+            _authService = service;
+        }
 
         public IHandler SetNextHandler(IHandler nextHandlerInstance)
         {
@@ -24,33 +25,18 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
         public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            if (String.IsNullOrEmpty(HealthChecksBuilder.ApiKey))
+            if (!_authService.NeedAuthentication())
             {
                 return await _nextHandler.HandleRequest(request, cancellationToken);
             }
 
-            if (!validateKey(request))
+            if (!_authService.ValidateApiKey(request))
             {
-                var response = new HttpResponseMessage(HttpStatusCode.Forbidden)
-                {
-                    Content = new ObjectContent<ErrorResponse>(
-                        new ErrorResponse { Error = $"ApiKey is invalid or not provided." },
-                        new JsonMediaTypeFormatter { SerializerSettings = SerializerSettings }
-                    )
-                };
-
-                return response;
+                var error = new ForbiddenError();
+                return MakeResponse<Object>(error.HttpErrorResponse, error.HttpErrorStatusCode);
             }
 
             return await _nextHandler.HandleRequest(request, cancellationToken);
-        }
-
-        private bool validateKey(HttpRequestMessage request)
-        {
-            //query.TryGetValue
-            var query = request.RequestUri.ParseQueryString();
-            string key = query["ApiKey"];
-            return (key == HealthChecksBuilder.ApiKey);
         }
     }
 }

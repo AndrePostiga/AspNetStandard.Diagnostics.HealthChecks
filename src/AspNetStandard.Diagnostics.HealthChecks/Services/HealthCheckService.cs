@@ -7,33 +7,70 @@ using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
 
 [assembly: InternalsVisibleTo("AspNetStandard.Diagnostics.HealthChecks.Tests")]
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
-    internal class HealthCheckService
+    internal class HealthCheckService : IHealthCheckService
     {
-        private readonly IDictionary<string, IHealthCheck> _healthChecks;
-        private readonly IDictionary<HealthStatus, HttpStatusCode> _resultStatusCodes;
+        private HealthChecksBuilder _healthChecksBuilder { get; }
 
-        public HealthCheckService(IDictionary<string, IHealthCheck> healthChecks, IDictionary<HealthStatus, HttpStatusCode> resultStatusCodes)
+        private readonly HttpConfiguration _httpConfiguration;
+        private IDictionary<string, IHealthCheck> _healthChecksInstances { get => ResolveDependenciesOfHealthChecks(); }
+
+        public HealthCheckService(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder)
         {
-            _healthChecks = healthChecks;
-            _resultStatusCodes = resultStatusCodes;
+            _healthChecksBuilder = healthChecksBuilder;
+            _httpConfiguration = httpConfiguration;
         }
 
-        public HttpStatusCode GetStatusCode(HealthStatus healthStatus)
+        // isso nem era pra estar nos services, refatorar pro handler
+        public HttpStatusCode GetStatusCode(HealthStatus healthstatus)
         {
-            return _resultStatusCodes[healthStatus];
+            return _healthChecksBuilder.ResultStatusCodes[healthstatus];
         }
+
+        //public async Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default)
+        //{
+        //    var healthCheckResponse = new HealthCheckResponse();
+        //    var tasks = _healthChecksInstances.Select(c => new { name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
+        //    var sw = new Stopwatch();
+        //    await Task.Run(() =>
+        //    {
+        //        Parallel.ForEach(tasks, async task =>
+        //        {
+        //            try
+        //            {
+        //                cancellationToken.ThrowIfCancellationRequested();
+        //                sw.Reset();
+        //                sw.Start();
+        //                var result = await task.result;
+        //                sw.Stop();
+        //                healthCheckResponse.Entries.Add(task.name, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
+        //            }
+        //            catch (OperationCanceledException)
+        //            {
+        //                throw;
+        //            }
+        //            catch
+        //            {
+        //                healthCheckResponse.Entries.Add(task.name, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
+        //            }
+        //        });
+        //    });
+
+        //    healthCheckResponse.SetOverAllStatus();
+        //    healthCheckResponse.TotalResponseTime = healthCheckResponse.Entries.Values.Sum(c => c.ResponseTime);
+        //    return healthCheckResponse;
+
+        //}
 
         public async Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default)
-        {
-            var healthCheckResults = new HealthCheckResponse();
-
-            var tasks = _healthChecks.Select(c => new { name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
-
+        {            
+            var healthCheckResponse = new HealthCheckResponse();
+            var tasks = _healthChecksInstances.Select(c => new { name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
             var sw = new Stopwatch();
 
             foreach (var task in tasks)
@@ -41,13 +78,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 try
                 {
                     cancellationToken.ThrowIfCancellationRequested();
-
                     sw.Reset();
                     sw.Start();
                     var result = await task.result;
                     sw.Stop();
 
-                    healthCheckResults.Entries.Add(task.name, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
+                    healthCheckResponse.Entries.Add(task.name, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
                 }
                 catch (OperationCanceledException)
                 {
@@ -55,37 +91,16 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 }
                 catch
                 {
-                    healthCheckResults.Entries.Add(task.name, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
+                    healthCheckResponse.Entries.Add(task.name, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
                 }
             }
 
-            var status = HealthStatus.Healthy;
-
-            //Extrair pra classe
-            foreach (var healthCheckResultExtended in healthCheckResults.Entries.Values)
-            {
-                if (healthCheckResultExtended.Status == HealthStatus.Unhealthy)
-                {
-                    status = HealthStatus.Unhealthy;
-                    break;
-                }
-
-                if (healthCheckResultExtended.Status == HealthStatus.Degraded)
-                {
-                    status = HealthStatus.Degraded;
-                }
-            }
-            //Classe
-
-            healthCheckResults.OverAllStatus = status;
-            healthCheckResults.TotalResponseTime = healthCheckResults.Entries.Values.Sum(c => c.ResponseTime);
-
-            return healthCheckResults;
+            return healthCheckResponse;
         }
 
         public async Task<HealthCheckResultExtended> GetHealthAsync(string healthCheckName)
         {
-            if (!_healthChecks.TryGetValue(healthCheckName, out var healthCheck))
+            if (!_healthChecksInstances.TryGetValue(healthCheckName, out var healthCheck))
             {
                 return null;
             }
@@ -104,6 +119,30 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
             catch
             {
                 return new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy));
+            }
+        }
+
+        private IDictionary<string, IHealthCheck> ResolveDependenciesOfHealthChecks()
+        {
+            using (var dependencyScope = _httpConfiguration.DependencyResolver.BeginScope())
+            {
+                var result = new Dictionary<string, IHealthCheck>();
+
+                foreach (var registration in _healthChecksBuilder.HealthChecks)
+                {
+                    if (registration.Value.IsSingleton)
+                    {
+                        result.Add(registration.Key, registration.Value.Instance);
+                    }
+                    else
+                    {
+                        var instance = (IHealthCheck)dependencyScope.GetService(registration.Value.Type);
+
+                        result.Add(registration.Key, instance);
+                    }
+                }
+
+                return result;
             }
         }
     }
