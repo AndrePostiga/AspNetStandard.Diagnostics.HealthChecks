@@ -8,13 +8,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         public HealthCheckResultExtended(HealthCheckResult healthCheckResult) :
             base(healthCheckResult.Status, healthCheckResult.Description, healthCheckResult.Exception)
         {
-            LastExecutionUtc = DateTime.UtcNow;
+            LastExecution = DateTime.UtcNow;
         }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public long? ResponseTime { get; set; }
 
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
-        public DateTime LastExecutionUtc { get; set; }
+        public DateTime LastExecution { get; set; }
     }
 }
