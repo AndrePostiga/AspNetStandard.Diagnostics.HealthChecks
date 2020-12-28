@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
+﻿using System.Net.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
-    interface IAuthenticationService
+    internal interface IAuthenticationService
     {
         bool NeedAuthentication();
+
         bool ValidateApiKey(HttpRequestMessage request);
     }
 }

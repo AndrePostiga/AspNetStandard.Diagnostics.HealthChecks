@@ -1,13 +1,11 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web.Http;
 
 [assembly: InternalsVisibleTo("AspNetStandard.Diagnostics.HealthChecks.Tests")]
 
@@ -15,12 +13,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
     internal class HealthCheckService : IHealthCheckService
     {
-        private HealthChecksBuilder _healthChecksBuilder { get; }       
+        private HealthChecksBuilder _healthChecksBuilder { get; }
 
         public HealthCheckService(HealthChecksBuilder healthChecksBuilder)
         {
             _healthChecksBuilder = healthChecksBuilder;
-        }      
+        }
 
         //public async Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default)
         //{
@@ -58,7 +56,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
         //}
 
         public async Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default)
-        {            
+        {
             var healthCheckResponse = new HealthCheckResponse();
             var tasks = _healthChecksBuilder.HealthChecks.Select(c => new { name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
             var sw = new Stopwatch();

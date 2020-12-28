@@ -1,15 +1,13 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    class DependencyHandler : Handler, IChainable
+    internal class DependencyHandler : Handler, IChainable
     {
         private readonly HttpConfiguration _httpConfig;
         private readonly HealthChecksBuilder _hcBuilder;
@@ -19,6 +17,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
         {
             _httpConfig = httpConfig;
             _hcBuilder = builder;
+        }
+
+        public IHandler SetNextHandler(IHandler nextHandlerInstance)
+        {
+            _nextHandler = nextHandlerInstance;
+            return nextHandlerInstance;
         }
 
         public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -32,7 +36,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             System.Diagnostics.Debug.WriteLine("Resolvendo as dependências");
             var result = new Dictionary<string, IHealthCheck>();
 
-            var dependencyScope = _httpConfig.DependencyResolver.BeginScope();            
+            var dependencyScope = _httpConfig.DependencyResolver.BeginScope();
             foreach (var registration in _hcBuilder.HealthChecksDependencies)
             {
                 if (registration.Value.IsSingleton)
@@ -42,19 +46,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                 else
                 {
                     var instance = (IHealthCheck)dependencyScope.GetService(registration.Value.Type);
-
                     result.Add(registration.Key, instance);
                 }
-            }                            
+            }
 
             _hcBuilder.HealthChecks = new Dictionary<string, IHealthCheck>(result);
             return await _nextHandler.HandleRequest(request, cancellationToken);
-        }
-
-        public IHandler SetNextHandler(IHandler nextHandlerInstance)
-        {
-            _nextHandler = nextHandlerInstance;
-            return nextHandlerInstance;
         }
     }
 }

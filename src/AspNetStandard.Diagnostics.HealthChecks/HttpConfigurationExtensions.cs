@@ -18,10 +18,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             var authenticationHandler = new AuthenticationHandler(authenticationService);
             var healthCheckHandler = new HealthCheckHandler(healthChecksService);
 
-            
             dependencyHandler.SetNextHandler(authenticationHandler);
             authenticationHandler.SetNextHandler(healthCheckHandler);
-            
 
             httpConfiguration.Routes.MapHttpRoute(
                 name: "health_check",
