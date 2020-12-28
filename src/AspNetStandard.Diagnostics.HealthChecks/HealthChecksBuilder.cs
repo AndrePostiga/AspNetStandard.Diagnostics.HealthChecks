@@ -18,27 +18,29 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             {HealthStatus.Unhealthy, HttpStatusCode.ServiceUnavailable}
         };
 
-        internal IDictionary<string, Registration> HealthChecks { get; } = new Dictionary<string, Registration>(StringComparer.OrdinalIgnoreCase);
+        internal IDictionary<string, Registration> HealthChecksDependencies { get; } = new Dictionary<string, Registration>(StringComparer.OrdinalIgnoreCase);
+
+        internal IDictionary<string, IHealthCheck> HealthChecks { get; set; }
 
         internal bool AddWarningHeader { get; private set; } = true;
 
         public HealthChecksBuilder AddCheck(string name, IHealthCheck healthCheck)
         {
-            HealthChecks.Add(name, new Registration(healthCheck));
+            HealthChecksDependencies.Add(name, new Registration(healthCheck));
 
             return this;
         }
 
         public HealthChecksBuilder AddCheck<T>(string name) where T : IHealthCheck
         {
-            HealthChecks.Add(name, new Registration(typeof(T)));
+            HealthChecksDependencies.Add(name, new Registration(typeof(T)));
 
             return this;
         }
 
         public HealthChecksBuilder AddCheck(string name, Func<HealthCheckResult> check)
         {
-            HealthChecks.Add(name, new Registration(new LambdaHealthCheck(check)));
+            HealthChecksDependencies.Add(name, new Registration(new LambdaHealthCheck(check)));
 
             return this;
         }

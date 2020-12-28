@@ -11,19 +11,24 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             System.Diagnostics.Debug.WriteLine("Iniciei");
             var healthChecksBuilder = new HealthChecksBuilder();
 
-            var healthChecksService = new HealthCheckService(httpConfiguration, healthChecksBuilder);
+            var healthChecksService = new HealthCheckService(healthChecksBuilder);
             var authenticationService = new AuthenticationService(healthChecksBuilder);
 
+            var dependencyHandler = new DependencyHandler(httpConfiguration, healthChecksBuilder);
             var authenticationHandler = new AuthenticationHandler(authenticationService);
             var healthCheckHandler = new HealthCheckHandler(healthChecksService);
+
+            
+            dependencyHandler.SetNextHandler(authenticationHandler);
             authenticationHandler.SetNextHandler(healthCheckHandler);
+            
 
             httpConfiguration.Routes.MapHttpRoute(
                 name: "health_check",
                 routeTemplate: healthEndpoint,
                 defaults: new { check = RouteParameter.Optional },
                 constraints: null,
-                handler: authenticationHandler
+                handler: dependencyHandler
             );
 
             return healthChecksBuilder;

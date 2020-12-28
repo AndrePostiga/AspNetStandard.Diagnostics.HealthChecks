@@ -15,22 +15,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
     internal class HealthCheckService : IHealthCheckService
     {
-        private HealthChecksBuilder _healthChecksBuilder { get; }
+        private HealthChecksBuilder _healthChecksBuilder { get; }       
 
-        private readonly HttpConfiguration _httpConfiguration;
-        private IDictionary<string, IHealthCheck> _healthChecksInstances { get => ResolveDependenciesOfHealthChecks(); }
-
-        public HealthCheckService(HttpConfiguration httpConfiguration, HealthChecksBuilder healthChecksBuilder)
+        public HealthCheckService(HealthChecksBuilder healthChecksBuilder)
         {
             _healthChecksBuilder = healthChecksBuilder;
-            _httpConfiguration = httpConfiguration;
-        }
-
-        // isso nem era pra estar nos services, refatorar pro handler
-        public HttpStatusCode GetStatusCode(HealthStatus healthstatus)
-        {
-            return _healthChecksBuilder.ResultStatusCodes[healthstatus];
-        }
+        }      
 
         //public async Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default)
         //{
@@ -70,7 +60,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
         public async Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default)
         {            
             var healthCheckResponse = new HealthCheckResponse();
-            var tasks = _healthChecksInstances.Select(c => new { name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
+            var tasks = _healthChecksBuilder.HealthChecks.Select(c => new { name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
             var sw = new Stopwatch();
 
             foreach (var task in tasks)
@@ -100,7 +90,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
 
         public async Task<HealthCheckResultExtended> GetHealthAsync(string healthCheckName)
         {
-            if (!_healthChecksInstances.TryGetValue(healthCheckName, out var healthCheck))
+            if (!_healthChecksBuilder.HealthChecks.TryGetValue(healthCheckName, out var healthCheck))
             {
                 return null;
             }
@@ -122,28 +112,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
             }
         }
 
-        private IDictionary<string, IHealthCheck> ResolveDependenciesOfHealthChecks()
+        public HttpStatusCode GetStatusCode(HealthStatus healthstatus)
         {
-            using (var dependencyScope = _httpConfiguration.DependencyResolver.BeginScope())
-            {
-                var result = new Dictionary<string, IHealthCheck>();
-
-                foreach (var registration in _healthChecksBuilder.HealthChecks)
-                {
-                    if (registration.Value.IsSingleton)
-                    {
-                        result.Add(registration.Key, registration.Value.Instance);
-                    }
-                    else
-                    {
-                        var instance = (IHealthCheck)dependencyScope.GetService(registration.Value.Type);
-
-                        result.Add(registration.Key, instance);
-                    }
-                }
-
-                return result;
-            }
+            return _healthChecksBuilder.ResultStatusCodes[healthstatus];
         }
     }
 }
