@@ -13,8 +13,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.MongoDb
         private readonly string _dataBaseName;
         private readonly MongoClientSettings _mongoClientSettings;
 
-        #region ctor
-
         public MongoDbHealthCheck(string connectionString, string dataBaseName = default)
             : this(MongoClientSettings.FromUrl(MongoUrl.Create(connectionString)), dataBaseName)
         {
@@ -29,10 +27,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.MongoDb
             _dataBaseName = dataBaseName;
             _mongoClientSettings = clientSettings;
         }
-
-        #endregion ctor
-
-        #region Interface Implementation
 
         public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
@@ -60,7 +54,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks.MongoDb
                 return new HealthCheckResult(HealthStatus.Unhealthy, "MongoDb is unhealthy", exception: ex);
             }
         }
-
-        #endregion Interface Implementation
     }
 }

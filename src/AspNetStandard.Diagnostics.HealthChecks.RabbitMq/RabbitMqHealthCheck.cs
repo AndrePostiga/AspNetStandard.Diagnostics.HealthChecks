@@ -13,8 +13,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
         private readonly Uri _rabbitConnectionString;
         private readonly SslOption _sslOption;
 
-        #region ctor
-
         public RabbitMqHealthCheck(IConnection connection)
         {
             _connection = connection ?? throw new ArgumentNullException(nameof(connection));
@@ -30,10 +28,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
             _rabbitConnectionString = rabbitConnectionString;
             _sslOption = ssl;
         }
-
-        #endregion ctor
-
-        #region Interface Implementation
 
         public Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
@@ -69,8 +63,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
 
                 _connection = _factory.CreateConnection();
             }
-        }
-
-        #endregion Interface Implementation
+        }        
     }
 }
