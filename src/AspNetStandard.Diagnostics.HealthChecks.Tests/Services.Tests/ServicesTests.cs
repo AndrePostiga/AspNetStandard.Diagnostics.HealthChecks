@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
+using Moq;
 using AspNetStandard.Diagnostics.HealthChecks;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
 using AspNetStandard.Diagnostics.HealthChecks.Entities;
@@ -9,71 +10,26 @@ using System.Threading.Tasks;
 using System.Threading;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
-{
-    public class AnyImplementationOfIHealthcheck : IHealthCheck
-    {
-        public Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
-        {            
-            return Task.FromResult(new HealthCheckResult(HealthStatus.Healthy, "AnyDescription", null));
-        }
-    }
-    public class AnyImplementationOfIHealthcheckThatIsDegraded : IHealthCheck
-    {
-        public Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
-        {
-            return Task.FromResult(new HealthCheckResult(HealthStatus.Degraded, "AnyDescription", null));
-        }
-    }
-    public class AnyImplementationOfIHealthcheckThatThrows : IHealthCheck
-    {
-        public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
-        {
-            throw new TimeoutException();            
-        }
-    }
-
+{  
     public class ServicesTests
     {
+        Mock<IHealthCheck> mockHealthyHC = new Mock<IHealthCheck>();
+        Mock<IHealthCheck> mockDegradedHC = new Mock<IHealthCheck>();
+        Mock<IHealthCheck> mockUnhealthyHC = new Mock<IHealthCheck>();
+        Mock<IHealthCheck> mockThrowsHC = new Mock<IHealthCheck>();
 
-        #region Before Test
-        public HealthChecksBuilder getBuilder()
+        public ServicesTests()
         {
-            return new HealthChecksBuilder();
+            mockHealthyHC.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(new HealthCheckResult(HealthStatus.Healthy, "AnyDescription", null)));
+            mockDegradedHC.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(new HealthCheckResult(HealthStatus.Degraded, "AnyDescription", null)));
+            mockUnhealthyHC.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(new HealthCheckResult(HealthStatus.Unhealthy, "AnyDescription", null)));
+            mockThrowsHC.Setup(x => x.CheckHealthAsync(default)).ThrowsAsync(new Exception("AnyException"));
         }
-
-        public Dictionary<string, IHealthCheck> getFakeHealthChecks()
-        {
-            var healthChecks = new Dictionary<string, IHealthCheck>()
-            {
-                { "AnyDatabase" , new AnyImplementationOfIHealthcheck() },
-                { "AnyMessageQueue" , new AnyImplementationOfIHealthcheckThatIsDegraded() },
-            };
-
-            return healthChecks;
-        }
-
-        public Dictionary<string, IHealthCheck> getFakeHealthChecksThatThrows()
-        {
-            var healthChecks = new Dictionary<string, IHealthCheck>()
-            {
-                { "AnyDatabase" , new AnyImplementationOfIHealthcheckThatThrows() },
-                { "AnyMessageQueue" , new AnyImplementationOfIHealthcheckThatThrows() },
-            };
-
-            return healthChecks;
-        }
-
-        internal HealthCheckService GetSut()
-        {
-            return new HealthCheckService(getFakeHealthChecks(), getBuilder().ResultStatusCodes);
-        }
-        #endregion
-
-
+         
         [Fact(DisplayName = "Should return correct status code if builder remain not modified")]
         public void ShouldGetStandardStatusCode()
-        {
-            var sut = (HealthCheckService)GetSut();
+        {            
+            var sut = new HealthCheckService(new HealthChecksBuilder());
 
             var ActDegradedStatusCode = sut.GetStatusCode(HealthStatus.Degraded);
             var ActHealthyStatusCode = sut.GetStatusCode(HealthStatus.Healthy);
@@ -86,15 +42,15 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 
         [Fact(DisplayName = "Should return correct custom status code if diferent status code was injected")]
         public void ShouldGetCustomStatusCode()
-        {
-            var customBuilder = getBuilder();
+        {   
+            var customBuilder = new HealthChecksBuilder();
             customBuilder.OverrideResultStatusCodes(
                 System.Net.HttpStatusCode.NotFound,
                 System.Net.HttpStatusCode.InternalServerError,
                 System.Net.HttpStatusCode.Created
             );
 
-            var sut = new HealthCheckService(getFakeHealthChecks(), customBuilder.ResultStatusCodes);
+            var sut = new HealthCheckService(customBuilder);
 
             var ActDegradedStatusCode = sut.GetStatusCode(HealthStatus.Degraded);
             var ActHealthyStatusCode = sut.GetStatusCode(HealthStatus.Healthy);
@@ -108,70 +64,154 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
         [Fact(DisplayName = "Should return correct healthCheckResponse properties")]
         public async Task ShouldGetHealthCheckAsync()
         {
+            var customBuilder = new HealthChecksBuilder();
+            customBuilder.HealthChecks = new Dictionary<string, IHealthCheck>() {
+                {"AnyImplementation", mockHealthyHC.Object }
+            };            
 
-            var sut = (HealthCheckService)GetSut();
+            var sut = new HealthCheckService(customBuilder);
 
-            var ActHealthCheck = await sut.GetHealthAsync();
+            var ActResponse = await sut.GetHealthAsync();
 
-            var ExpectedEntries = new HealthCheckResponse();
-
-            var entries = new Dictionary<string, HealthCheckResultExtended>()
-            {
-                { "AnyDatabase", new HealthCheckResultExtended(await getFakeHealthChecks()["AnyDatabase"].CheckHealthAsync()) },
-                { "AnyMessageQueue", new HealthCheckResultExtended(await getFakeHealthChecks()["AnyMessageQueue"].CheckHealthAsync()) }
-            };
-
-            ExpectedEntries.Entries.Add("AnyDatabase", entries["AnyDatabase"]);
-            ExpectedEntries.Entries.Add("AnyMessageQueue", entries["AnyMessageQueue"]);
-            ExpectedEntries.OverAllStatus = HealthStatus.Degraded;
+            var ExpectedResponse = new HealthCheckResponse();
+            ExpectedResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(await mockHealthyHC.Object.CheckHealthAsync()));
             
-            Assert.Equal(ExpectedEntries.Entries["AnyDatabase"], ActHealthCheck.Entries["AnyDatabase"]);
-            Assert.Equal(ExpectedEntries.Entries["AnyMessageQueue"], ActHealthCheck.Entries["AnyMessageQueue"]);
-            Assert.Equal(ExpectedEntries.OverAllStatus, ActHealthCheck.OverAllStatus);
+            Assert.Equal(ExpectedResponse.OverAllStatus, ActResponse.OverAllStatus);
+            Assert.Equal(ExpectedResponse.Entries, ActResponse.Entries);            
         }
 
 
-        [Fact(DisplayName = "Should cancel check if cancelletion token is canceled")]
-        public async Task ShouldCancelCheck()
+        [Fact(DisplayName = "Should cancel check if CancellationToken if token was canceled")]
+        public void ShouldCancelCheck()
         {
-
-            var sut = (HealthCheckService)GetSut();
+            var sut = new HealthCheckService(new HealthChecksBuilder());
 
             var tokenSource = new CancellationTokenSource();
             var token = tokenSource.Token;
 
-            Func<Task> act = () => sut.GetHealthAsync(token);            
+            Func<Task> act = () => sut.GetHealthAsync(token);
 
             tokenSource.Cancel();
 
-            await Assert.ThrowsAsync<OperationCanceledException>(act);
-        }      
+            Assert.ThrowsAsync<OperationCanceledException>(act);
+        }
 
 
         [Fact(DisplayName = "Should return unhealthy response if GetHealth throws exception")]
         public async Task ShouldReturnUnhealthIfThrows()
-        {
+        {   
+            var customBuilder = new HealthChecksBuilder();
+            customBuilder.HealthChecks = new Dictionary<string, IHealthCheck>() {
+                {"AnyImplementation", mockThrowsHC.Object }
+            };
 
-            var sut = new HealthCheckService(getFakeHealthChecksThatThrows(), getBuilder().ResultStatusCodes);
+            var sut = new HealthCheckService(customBuilder);
 
-            var act = await sut.GetHealthAsync();
-            
-            Assert.Equal(HealthStatus.Unhealthy, act.OverAllStatus);
+            var ActResponse = await sut.GetHealthAsync();
+
+            var ExpectedResponse = new HealthCheckResponse();
+            ExpectedResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
+
+            Assert.Equal(HealthStatus.Unhealthy, ActResponse.OverAllStatus);
+            Assert.Equal(ExpectedResponse.Entries, ActResponse.Entries);
         }
 
 
         [Fact(DisplayName = "Should return degraded status if at least one check is degraded")]
         public async Task ShouldReturnDegradedOverAll()
         {
+            var customBuilder = new HealthChecksBuilder();
+            customBuilder.HealthChecks = new Dictionary<string, IHealthCheck>() {
+                {"AnyImplementation", mockDegradedHC.Object },
+                {"AnotherImplementation", mockHealthyHC.Object }
+            };
 
-            var sut = (HealthCheckService)GetSut();
+            var sut = new HealthCheckService(customBuilder);
 
-            var act = await sut.GetHealthAsync();
+            var ActResponse = await sut.GetHealthAsync();
 
-            Assert.Equal(HealthStatus.Degraded, act.OverAllStatus);
+            var ExpectedResponse = new HealthCheckResponse();
+            ExpectedResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(await mockDegradedHC.Object.CheckHealthAsync()));
+            ExpectedResponse.Entries.Add("AnotherImplementation", new HealthCheckResultExtended(await mockHealthyHC.Object.CheckHealthAsync()));
+
+            Assert.Equal(HealthStatus.Degraded, ActResponse.OverAllStatus);
+            Assert.Equal(ExpectedResponse.Entries, ActResponse.Entries);
+        }
+
+        [Fact(DisplayName = "Should return unhealthy status if at least one check is unhealthy")]
+        public async Task ShouldReturnUnhealthyOverAll()
+        {
+            var customBuilder = new HealthChecksBuilder();
+            customBuilder.HealthChecks = new Dictionary<string, IHealthCheck>() {
+                {"AnyImplementation", mockDegradedHC.Object },
+                {"AnotherImplementation", mockUnhealthyHC.Object }
+            };
+
+            var sut = new HealthCheckService(customBuilder);
+
+            var ActResponse = await sut.GetHealthAsync();
+
+            var ExpectedResponse = new HealthCheckResponse();
+            ExpectedResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(await mockDegradedHC.Object.CheckHealthAsync()));
+            ExpectedResponse.Entries.Add("AnotherImplementation", new HealthCheckResultExtended(await mockUnhealthyHC.Object.CheckHealthAsync()));
+
+            Assert.Equal(HealthStatus.Unhealthy, ActResponse.OverAllStatus);
+            Assert.Equal(ExpectedResponse.Entries, ActResponse.Entries);
         }
 
 
+        [Fact(DisplayName = "Should check specific healthcheck searched by name")]
+        public async Task ShouldCheckByName()
+        {
+            var customBuilder = new HealthChecksBuilder();
+            customBuilder.HealthChecks = new Dictionary<string, IHealthCheck>() {
+                {"AnyImplementation", mockDegradedHC.Object },
+                {"AnotherImplementation", mockUnhealthyHC.Object }
+            };
+
+            var sut = new HealthCheckService(customBuilder);
+
+            var ActResponse = await sut.GetHealthAsync("AnotherImplementation");
+
+            var ExpectedResponse = new HealthCheckResultExtended(await mockUnhealthyHC.Object.CheckHealthAsync());            
+            
+            Assert.Equal(ExpectedResponse, ActResponse);
+        }
+
+        [Fact(DisplayName = "Should return unhealthy if specific HC throws")]
+        public async Task ShouldReturnUnhealthyIfSearchedCheckThrows()
+        {
+            var customBuilder = new HealthChecksBuilder();
+            customBuilder.HealthChecks = new Dictionary<string, IHealthCheck>() {
+                {"AnyImplementation", mockDegradedHC.Object },
+                {"AnotherImplementation", mockThrowsHC.Object }
+            };
+
+            var sut = new HealthCheckService(customBuilder);
+
+            var ActResponse = await sut.GetHealthAsync("AnotherImplementation");
+
+            var ExpectedResponse = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy));
+
+            Assert.Equal(ExpectedResponse, ActResponse);
+        }
+
+
+        [Fact(DisplayName = "Should return null if specific HC not founded")]
+        public async Task ShouldReturnNullIfSearchedCheckNotFound()
+        {
+            var customBuilder = new HealthChecksBuilder();
+            customBuilder.HealthChecks = new Dictionary<string, IHealthCheck>() {
+                {"AnyImplementation", mockDegradedHC.Object },
+                {"AnotherImplementation", mockThrowsHC.Object }
+            };
+
+            var sut = new HealthCheckService(customBuilder);
+
+            var ActResponse = await sut.GetHealthAsync("DoenstExistImplementation");
+
+            Assert.True(ActResponse == null);
+        }
 
     }
 }
