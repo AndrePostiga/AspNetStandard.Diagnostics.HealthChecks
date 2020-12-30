@@ -2,7 +2,7 @@
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
-    internal interface IAuthenticationService
+    public interface IAuthenticationService
     {
         bool NeedAuthentication();
 
