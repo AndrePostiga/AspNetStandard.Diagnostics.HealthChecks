@@ -3,7 +3,7 @@ using System;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 {
-    internal class HealthCheckResultExtended : HealthCheckResult
+    public class HealthCheckResultExtended : HealthCheckResult
     {
         public HealthCheckResultExtended(HealthCheckResult healthCheckResult) :
             base(healthCheckResult.Status, healthCheckResult.Description, healthCheckResult.Exception)

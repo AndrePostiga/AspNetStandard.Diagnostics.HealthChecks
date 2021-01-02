@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
-    internal class HealthCheckService : IHealthCheckService
+    public class HealthCheckService : IHealthCheckService
     {
         private HealthChecksBuilder _healthChecksBuilder { get; }
 
