@@ -197,8 +197,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
         }
 
 
-        [Fact(DisplayName = "Should return null if specific HC not founded")]
-        public async Task ShouldReturnNullIfSearchedCheckNotFound()
+        [Fact(DisplayName = "Should throw error if specific HC not founded")]
+        public void ShouldReturnNullIfSearchedCheckNotFound()
         {
             var customBuilder = new HealthChecksBuilder();
             customBuilder.HealthChecks = new Dictionary<string, IHealthCheck>() {
@@ -208,9 +208,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 
             var sut = new HealthCheckService(customBuilder);
 
-            var ActResponse = await sut.GetHealthAsync("DoenstExistImplementation");
+            Func<Task> act = () => sut.GetHealthAsync("DoenstExistImplementation");
 
-            Assert.True(ActResponse == null);
+            Assert.ThrowsAsync<OperationCanceledException>(act);
         }
 
     }

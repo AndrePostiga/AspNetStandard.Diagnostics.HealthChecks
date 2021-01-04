@@ -91,16 +91,16 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             Assert.Equal(json, await act.Content.ReadAsStringAsync());
         }
 
-        [Fact(DisplayName = "Should return not found error if hc was not found")]
-        public async void ShouldReturnErroIfCheckWasNotFound()
-        {   
-            mockHcService.Setup(x => x.GetHealthAsync("AnyImplementation")).Returns(Task.FromResult<HealthCheckResultExtended>(null));
+        [Fact(DisplayName = "Should return not found error if hc throws")]
+        public async Task ShouldReturnErroIfCheckWasNotFound()
+        {
+            mockHcService.Setup(x => x.GetHealthAsync("AnyImplementation")).ThrowsAsync(new NotFoundError("AnyImplementation"));
 
             var sut = new HealthCheckHandler(mockHcService.Object);
-            
-            var act = await sut.HandleRequest(httpMessageWithParameter, anyTokenInstance);
 
-            string json = JsonConvert.SerializeObject(new NotFoundError("AnyImplementation").HttpErrorResponse, SerializerSettings);
+            var act = await sut.HandleRequest(httpMessageWithParameter, anyTokenInstance);            
+
+            string json = JsonConvert.SerializeObject(new NotFoundError("AnyImplementation").HttpErrorResponse, SerializerSettings);            
 
             Assert.Equal(HttpStatusCode.NotFound, act.StatusCode);
             Assert.Equal(json, await act.Content.ReadAsStringAsync());

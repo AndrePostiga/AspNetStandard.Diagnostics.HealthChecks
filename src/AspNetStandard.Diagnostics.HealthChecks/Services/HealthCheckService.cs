@@ -1,4 +1,5 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
+using AspNetStandard.Diagnostics.HealthChecks.Errors;
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -55,7 +56,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
         {
             if (!_healthChecksBuilder.HealthChecks.TryGetValue(healthCheckName, out var healthCheck))
             {
-                return null;
+                throw new NotFoundError(healthCheckName);
             }
 
             try

@@ -54,13 +54,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             return this;
         }
 
-        public HealthChecksBuilder Configure(bool addWarningHeader)
-        {
-            AddWarningHeader = addWarningHeader;
-
-            return this;
-        }
-
         internal string ApiKey = null;
 
         public HealthChecksBuilder UseAuthorization(string apiKey)
