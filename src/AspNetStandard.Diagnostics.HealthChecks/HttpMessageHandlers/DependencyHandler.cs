@@ -7,7 +7,7 @@ using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    internal class DependencyHandler : Handler, IChainable
+    public class DependencyHandler : Handler, IChainable
     {
         private readonly HttpConfiguration _httpConfig;
         private readonly HealthChecksBuilder _hcBuilder;

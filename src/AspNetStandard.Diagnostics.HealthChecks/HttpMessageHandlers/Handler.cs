@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    internal abstract class Handler : DelegatingHandler, IHandler
+    public abstract class Handler : DelegatingHandler, IHandler
     {
         protected JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings
         {
