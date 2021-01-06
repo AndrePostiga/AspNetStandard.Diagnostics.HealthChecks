@@ -99,9 +99,9 @@ Os contratos que o HC retorna são semelhantes aos exemplos abaixo
 ```
 
 A aplicação está sendo desenvolvida e os próximos passos são:
- - [] Criar extensão para o SQL Server
- - [] Criar extensão para o Redis
- - [] Criar pipeline de CI/CD
- - [] Fazer integração com o SonarQube
- - [] Fazer deploy no Nuget.org
+ - [ ] Criar extensão para o SQL Server
+ - [ ] Criar extensão para o Redis
+ - [ ] Criar pipeline de CI/CD
+ - [ ] Fazer integração com o SonarQube
+ - [ ] Fazer deploy no Nuget.org
 
