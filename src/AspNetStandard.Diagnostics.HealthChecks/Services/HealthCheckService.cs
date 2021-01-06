@@ -24,20 +24,19 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
         public async Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default)
         {
             var healthCheckResponse = new HealthCheckResponse();
-            var tasks = _healthChecksBuilder.HealthChecks.Select(c => new { name = c.Key, result = c.Value.CheckHealthAsync(cancellationToken) });
             var sw = new Stopwatch();
 
-            foreach (var task in tasks)
+            foreach (var task in _healthChecksBuilder.HealthChecks)
             {
                 try
                 {
                     cancellationToken.ThrowIfCancellationRequested();
                     sw.Reset();
                     sw.Start();
-                    var result = await task.result;
+                    var result = await task.Value.CheckHealthAsync(cancellationToken);
                     sw.Stop();
 
-                    healthCheckResponse.Entries.Add(task.name, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
+                    healthCheckResponse.Entries.Add(task.Key, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
                 }
                 catch (OperationCanceledException)
                 {
@@ -45,7 +44,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 }
                 catch
                 {
-                    healthCheckResponse.Entries.Add(task.name, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
+                    healthCheckResponse.Entries.Add(task.Key, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
                 }
             }
 

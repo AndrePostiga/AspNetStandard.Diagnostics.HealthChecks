@@ -23,12 +23,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (obj == null || !(obj is HealthCheckResult))
             {
                 return false;
             }
 
             var item = obj as HealthCheckResult;
+
             return (
                 this.Description == item.Description
                 && this.Exception == item.Exception
