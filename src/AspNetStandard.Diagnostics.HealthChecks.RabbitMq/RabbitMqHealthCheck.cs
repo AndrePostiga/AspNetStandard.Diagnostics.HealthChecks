@@ -23,7 +23,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        public RabbitMqHealthCheck(Uri rabbitConnectionString, SslOption ssl)
+        public RabbitMqHealthCheck(Uri rabbitConnectionString, SslOption ssl = null)
         {
             _rabbitConnectionString = rabbitConnectionString;
             _sslOption = ssl;

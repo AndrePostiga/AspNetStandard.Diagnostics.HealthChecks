@@ -10,10 +10,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
     public abstract class Handler : DelegatingHandler, IHandler
     {
-        protected JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings
+        protected JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings()
         {
-            ContractResolver = new DefaultContractResolver() { NamingStrategy = new SnakeCaseNamingStrategy() },
-        };
+            ContractResolver = new DefaultContractResolver() { NamingStrategy = new SnakeCaseNamingStrategy() }
+        };        
 
         protected Handler()
         {
