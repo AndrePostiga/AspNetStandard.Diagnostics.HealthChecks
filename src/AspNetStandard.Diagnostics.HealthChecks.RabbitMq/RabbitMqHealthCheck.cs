@@ -29,6 +29,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
             _sslOption = ssl;
         }
 
+        public RabbitMqHealthCheck(string rabbitConnectionString, SslOption ssl = null) : this(new Uri(rabbitConnectionString), ssl)
+        { }
+
         public Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
             try
