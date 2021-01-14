@@ -1,8 +1,11 @@
 ﻿using System.Net.Http;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
-    public interface IAuthenticationService
+    internal interface IAuthenticationService
     {
         bool NeedAuthentication();
 

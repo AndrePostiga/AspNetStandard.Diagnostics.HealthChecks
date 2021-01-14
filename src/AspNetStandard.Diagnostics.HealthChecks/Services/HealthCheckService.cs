@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
-    public class HealthCheckService : IHealthCheckService
+    internal class HealthCheckService : IHealthCheckService
     {
         private HealthChecksBuilder _healthChecksBuilder { get; }
 

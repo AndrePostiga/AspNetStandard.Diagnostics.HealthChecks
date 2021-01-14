@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 {
-    public class HealthCheckResponse
+    internal class HealthCheckResponse
     {
         public HealthCheckResponse()
         {

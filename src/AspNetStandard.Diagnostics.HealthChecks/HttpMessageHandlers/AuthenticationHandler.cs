@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    public class AuthenticationHandler : Handler, IChainable
+    internal class AuthenticationHandler : Handler, IChainable
     {
         private IHandler _nextHandler;
         private readonly IAuthenticationService _authService;

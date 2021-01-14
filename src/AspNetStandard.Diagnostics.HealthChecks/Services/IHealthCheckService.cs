@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
-    public interface IHealthCheckService
+    internal interface IHealthCheckService
     {
         Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default);
 

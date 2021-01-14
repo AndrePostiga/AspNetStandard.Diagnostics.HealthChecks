@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {
-    internal class LambdaHealthCheck : IHealthCheck
+    public class LambdaHealthCheck : IHealthCheck
     {
         private readonly Func<HealthCheckResult> _check;
 

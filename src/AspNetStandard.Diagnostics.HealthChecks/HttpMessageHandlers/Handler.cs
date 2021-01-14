@@ -3,12 +3,13 @@ using Newtonsoft.Json.Serialization;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    public abstract class Handler : DelegatingHandler, IHandler
+    internal abstract class Handler : DelegatingHandler, IHandler
     {
         protected JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings()
         {

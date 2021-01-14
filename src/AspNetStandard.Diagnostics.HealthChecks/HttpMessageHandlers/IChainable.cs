@@ -1,6 +1,6 @@
 ﻿namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
-    public interface IChainable
+    internal interface IChainable
     {
         IHandler SetNextHandler(IHandler nextHandlerInstance);
     }

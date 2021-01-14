@@ -3,7 +3,7 @@ using System.Net;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Errors
 {
-    public class HttpError : Exception
+    internal class HttpError : Exception
     {
         public object HttpErrorResponse { get; }
         public HttpStatusCode HttpErrorStatusCode { get; }
