@@ -18,6 +18,7 @@
     <FileVersion>1.0.0.0</FileVersion>
     <AssemblyName>AspNetStandard.Diagnostics.HealthChecks</AssemblyName>
     <RootNamespace>AspNetStandard.Diagnostics.HealthChecks</RootNamespace>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
