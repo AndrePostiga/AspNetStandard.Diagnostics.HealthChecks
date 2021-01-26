@@ -14,7 +14,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
         protected JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings()
         {
             ContractResolver = new DefaultContractResolver() { NamingStrategy = new SnakeCaseNamingStrategy() }
-        };        
+        }; // ToDo: Isso aqui não deveria ser configurável?        
 
         protected Handler()
         {

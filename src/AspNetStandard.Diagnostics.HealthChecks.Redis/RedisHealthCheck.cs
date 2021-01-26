@@ -28,7 +28,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Redis
                     if (!_connections.TryAdd(_redisConnectionString, connection))
                     {
                         connection.Dispose();
-                        connection = _connections[_redisConnectionString];
+                        connection = _connections[_redisConnectionString]; // ToDo: Isso vai gerar uma exceção em 100% das vezes.
                     }
                 }
 

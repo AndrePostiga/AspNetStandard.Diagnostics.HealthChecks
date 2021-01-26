@@ -29,11 +29,11 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
         {
             if (_hcBuilder.HealthChecks != null)
             {
-                System.Diagnostics.Debug.WriteLine("Não é nulo e vai direto");
+                System.Diagnostics.Debug.WriteLine("Não é nulo e vai direto"); // ToDo: Deveria estar aqui?
                 return await _nextHandler.HandleRequest(request, cancellationToken);
             }
 
-            System.Diagnostics.Debug.WriteLine("Resolvendo as dependências");
+            System.Diagnostics.Debug.WriteLine("Resolvendo as dependências"); // ToDo: Deveria estar aqui?
             var result = new Dictionary<string, IHealthCheck>();
 
             var dependencyScope = _httpConfig.DependencyResolver.BeginScope();

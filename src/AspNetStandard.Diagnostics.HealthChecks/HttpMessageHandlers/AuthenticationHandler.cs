@@ -23,7 +23,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             return nextHandlerInstance;
         }
 
-        public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
+        public override async Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken) // ToDo: Ajustei a ordem dos modificadores.
         {
             if (!_authService.NeedAuthentication())
             {
@@ -33,7 +33,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             if (!_authService.ValidateApiKey(request))
             {
                 var error = new ForbiddenError();
-                return MakeResponse<Object>(error.HttpErrorResponse, error.HttpErrorStatusCode);
+                return MakeResponse(error.HttpErrorResponse, error.HttpErrorStatusCode); // ToDo: Removi o código não necessário.
             }
 
             return await _nextHandler.HandleRequest(request, cancellationToken);

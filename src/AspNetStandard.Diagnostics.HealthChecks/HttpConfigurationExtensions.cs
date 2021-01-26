@@ -8,7 +8,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
     {
         public static HealthChecksBuilder AddHealthChecks(this HttpConfiguration httpConfiguration, string healthEndpoint = "health")
         {
-            System.Diagnostics.Debug.WriteLine("Iniciei");
+            System.Diagnostics.Debug.WriteLine("Iniciei"); // ToDo: Era para isso estar aqui mesmo?
             var healthChecksBuilder = new HealthChecksBuilder();
 
             var healthChecksService = new HealthCheckService(healthChecksBuilder);
