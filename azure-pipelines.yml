@@ -1,0 +1,51 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+variables:
+  organization: 'AndrePostiga'
+  solution_path: 'src/AspNetStandard.Diagnostics.HealthChecks.sln'
+  project_name: 'AspNetStandard.Diagnostics.HealthChecks'
+  project_path: 'src/AspNetStandard.Diagnostics.HealthChecks/AspNetStandard.Diagnostics.HealthChecks.csproj'
+  net_version: 'netstandard2.0'
+  execute_test: 'true'
+  test_project_base_folder: 'src/AspNetStandard.Diagnostics.HealthChecks.Tests'
+  test_project_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Tests/AspNetStandard.Diagnostics.HealthChecks.Tests.csproj'
+
+
+trigger:
+- main
+- master
+
+pr:
+  branches:
+    include:
+    - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: BuildApp
+  jobs:
+  - job: Build
+    workspace:
+      clean: all      
+  steps:
+  - script: |
+      pwd && ls -la
+      dotnet restore "$(solution_path)"
+      dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/bin "$(project_path)"
+      mkdir artifact
+      cp -r $(System.DefaultWorkingDirectory)/bin artifact/bin
+    displayName: Build Application
+  - task: PublishPipelineArtifact@1
+    displayName: HealthCheck Lib Artifact
+    inputs:
+      path: $(System.DefaultWorkingDirectory)/artifact
+      artifact: $(project_name)
+
+
+
+
