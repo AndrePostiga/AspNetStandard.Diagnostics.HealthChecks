@@ -5,13 +5,29 @@
 
 variables:
   organization: 'AndrePostiga'
-  solution_path: 'src/AspNetStandard.Diagnostics.HealthChecks.sln'
-  project_name: 'AspNetStandard.Diagnostics.HealthChecks'
-  project_path: 'src/AspNetStandard.Diagnostics.HealthChecks/AspNetStandard.Diagnostics.HealthChecks.csproj'
+  
+
   net_version: 'netstandard2.0'
   execute_test: 'true'
   test_project_base_folder: 'src/AspNetStandard.Diagnostics.HealthChecks.Tests'
   test_project_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Tests/AspNetStandard.Diagnostics.HealthChecks.Tests.csproj'
+  
+  solution_path: 'src/AspNetStandard.Diagnostics.HealthChecks.sln'
+
+  project_name: 'AspNetStandard.Diagnostics.HealthChecks'
+  project_path: 'src/AspNetStandard.Diagnostics.HealthChecks/AspNetStandard.Diagnostics.HealthChecks.csproj'
+  
+  redis_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.Redis'
+  redis_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Redis/AspNetStandard.Diagnostics.HealthChecks.Redis.csproj'
+
+  mongo_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.MongoDb'
+  mongo_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.MongoDb/AspNetStandard.Diagnostics.HealthChecks.MongoDb.csproj'
+
+  rabbitmq_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.RabbitMq'
+  rabbitmq_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.RabbitMq/AspNetStandard.Diagnostics.HealthChecks.RabbitMq.csproj'
+
+  sqlserver_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.SqlServer'
+  sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
 
 
 trigger:
@@ -36,15 +52,40 @@ stages:
     - script: |
         pwd && ls -la
         dotnet restore "$(solution_path)"
-        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/bin "$(project_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(project_name)/bin "$(project_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(redis_extension_name)/bin "$(redis_extension_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(mongo_extension_name)/bin "$(mongo_extension_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(rabbitmq_extension_name)/bin "$(rabbitmq_extension_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)/bin "$(sqlserver_extension_path)"
         mkdir artifact
-        cp -r $(System.DefaultWorkingDirectory)/bin artifact/bin
+        cp -r $(System.DefaultWorkingDirectory)/binaries artifact/binaries
       displayName: Build Application
     - task: PublishPipelineArtifact@1
-      displayName: HealthCheck Lib Artifact
+      displayName: HealthCheck MainLib Artifact
       inputs:
-        path: $(System.DefaultWorkingDirectory)/artifact
+        path: $(System.DefaultWorkingDirectory)/binaries/$(project_name)
         artifact: $(project_name)
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck Redis Extension Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(redis_extension_name)
+        artifact: $(redis_extension_name)
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck Mongo Extension Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(mongo_extension_name)
+        artifact: $(mongo_extension_name)
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck RabbitMq Extension Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(rabbitmq_extension_name)
+        artifact: $(rabbitmq_extension_name)
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck SQLServer Extension Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)
+        artifact: $(sqlserver_extension_name)
+    
 
 
 
