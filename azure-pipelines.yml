@@ -32,19 +32,19 @@ stages:
   - job: Build
     workspace:
       clean: all      
-  steps:
-  - script: |
-      pwd && ls -la
-      dotnet restore "$(solution_path)"
-      dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/bin "$(project_path)"
-      mkdir artifact
-      cp -r $(System.DefaultWorkingDirectory)/bin artifact/bin
-    displayName: Build Application
-  - task: PublishPipelineArtifact@1
-    displayName: HealthCheck Lib Artifact
-    inputs:
-      path: $(System.DefaultWorkingDirectory)/artifact
-      artifact: $(project_name)
+    steps:
+    - script: |
+        pwd && ls -la
+        dotnet restore "$(solution_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/bin "$(project_path)"
+        mkdir artifact
+        cp -r $(System.DefaultWorkingDirectory)/bin artifact/bin
+      displayName: Build Application
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/artifact
+        artifact: $(project_name)
 
 
 
