@@ -30,7 +30,7 @@ variables:
   sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
 
   execute_sonarcloud: 'true'
-  sonarcloud_project: 'AspnetStandard.Diagnostics.Healthchecks'
+  sonarcloud_project: 'AndrePostiga_AspNetStandard.Diagnostics.HealthChecks'
   sonarcloud_organization: 'andrepostiga-github'
   sonarcloud_account: 'andrepostiga'
 
@@ -173,9 +173,5 @@ stages:
         displayName: Publish Sonarqube Analysis
         inputs:
           pollingTimeoutSec: '300'
-
-        
-#a
-
 
 
