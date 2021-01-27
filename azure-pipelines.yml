@@ -1,0 +1,177 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+variables:
+  organization: 'AndrePostiga'
+  
+
+  net_version: 'netstandard2.0'
+  execute_test: 'true'
+  test_project_base_folder: 'src/AspNetStandard.Diagnostics.HealthChecks.Tests'
+  test_project_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Tests/AspNetStandard.Diagnostics.HealthChecks.Tests.csproj'
+  
+  solution_path: 'src/AspNetStandard.Diagnostics.HealthChecks.sln'
+
+  project_name: 'AspNetStandard.Diagnostics.HealthChecks'
+  project_path: 'src/AspNetStandard.Diagnostics.HealthChecks/AspNetStandard.Diagnostics.HealthChecks.csproj'
+  
+  redis_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.Redis'
+  redis_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Redis/AspNetStandard.Diagnostics.HealthChecks.Redis.csproj'
+
+  mongo_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.MongoDb'
+  mongo_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.MongoDb/AspNetStandard.Diagnostics.HealthChecks.MongoDb.csproj'
+
+  rabbitmq_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.RabbitMq'
+  rabbitmq_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.RabbitMq/AspNetStandard.Diagnostics.HealthChecks.RabbitMq.csproj'
+
+  sqlserver_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.SqlServer'
+  sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
+
+  execute_sonarcloud: 'true'
+  sonarcloud_project: 'AndrePostiga_AspNetStandard.Diagnostics.HealthChecks'
+  sonarcloud_organization: 'andrepostiga'
+  sonarcloud_account: 'SonarCloudAndre'
+
+trigger:
+- main
+- master
+
+pr:
+  branches:
+    include:
+    - master
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- stage: BuildApp
+  jobs:
+  - job: Build
+    workspace:
+      clean: all      
+    steps:
+    - script: |
+        pwd && ls -la
+        dotnet restore "$(solution_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(project_name)/bin "$(project_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(redis_extension_name)/bin "$(redis_extension_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(mongo_extension_name)/bin "$(mongo_extension_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(rabbitmq_extension_name)/bin "$(rabbitmq_extension_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)/bin "$(sqlserver_extension_path)"
+        mkdir artifact
+        cp -r $(System.DefaultWorkingDirectory)/binaries artifact/binaries
+      displayName: Build Application
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck MainLib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(project_name)
+        artifact: $(project_name)
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck Redis Extension Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(redis_extension_name)
+        artifact: $(redis_extension_name)
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck Mongo Extension Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(mongo_extension_name)
+        artifact: $(mongo_extension_name)
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck RabbitMq Extension Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(rabbitmq_extension_name)
+        artifact: $(rabbitmq_extension_name)
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck SQLServer Extension Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)
+        artifact: $(sqlserver_extension_name)
+  - job: UnitTests
+    dependsOn:
+    - Build    
+    workspace:
+      clean: all
+    condition: and(succeeded(), eq(variables['execute_test'], 'true'))
+    steps:
+      - script: |
+          dotnet tool install --global coverlet.console 
+          dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
+          dotnet add $(test_project_path) package coverlet.msbuild
+          dotnet add $(test_project_path) package XunitXml.TestLogger
+          dotnet test /p:CollectCoverage=true \
+                      /p:CoverletOutputFormat=\"opencover,cobertura\" \
+                      /p:CoverletOutput=results/result \
+                      /p:Exclude=[xunit.*]* "$(solution_path)" \
+                      --test-adapter-path:. --logger:"xunit;LogFilePath=results/result.xunit.xml"
+          ./reportgenerator "-reports:$(test_project_base_folder)/results/result.opencover.xml" \
+                            "-targetdir:$(test_project_base_folder)/results/Cobertura" \
+                            "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+          echo "##vso[task.setvariable variable=OpencoverSonar;isOutput=true]sonar.cs.opencover.reportsPaths=$(Pipeline.Workspace)/result.opencover.xml"
+          ls $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results
+        displayName: Running Unit Tests
+        name: UnitTestsTask
+      - task: PublishPipelineArtifact@1
+        displayName: Store Test Result
+        inputs:
+          path: $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results
+          artifact: UnitTestResults
+      - task: PublishCodeCoverageResults@1
+        displayName: Publish Code Coverage 
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results/result.cobertura.xml
+          pathToSources: .
+          failIfCoverageEmpty: true
+      - task: PublishTestResults@2
+        displayName: Publish Test Result
+        inputs:
+          testResultsFormat: 'XUnit'
+          testResultsFiles: '$(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results/result.xunit.xml'
+          testRunTitle: 'Collecting Test Results'
+  - job: QA
+    dependsOn: 
+      - Build
+      - UnitTests
+    condition: |
+      and
+      (
+        in(dependencies.Build.result, 'Succeeded', 'Skipped'),
+        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
+        eq(variables['execute_sonarcloud'], 'true')
+      )
+    workspace:
+      clean: all
+    variables:
+      OpencoverSonar: $[ dependencies.UnitTests.outputs['UnitTestsTask.OpencoverSonar'] ]
+    steps:
+      - task: DownloadPipelineArtifact@2
+        displayName: Get Unit Test Result
+        condition: eq(variables['execute_test'], 'true')
+        inputs:
+          artifact: UnitTestResults
+      - task: SonarCloudPrepare@1
+        displayName: Start Sonarqube Analysis
+        inputs:
+          SonarCloud: '$(sonarcloud_account)'
+          organization: '$(sonarcloud_organization)'
+          scannerMode: 'MSBuild'
+          projectKey: '$(sonarcloud_project)'
+          projectName: '$(project_name)'
+          extraProperties: |
+            sonar.sourceEncoding=UTF-8
+            sonar.scm.forceReloadAll=true
+            $(OpencoverSonar)
+      - script: |
+          dotnet build "$(solution_path)"
+        displayName: Running Build for QA
+      - task: SonarCloudAnalyze@1
+        displayName: Finish Sonarqube Analysis
+      - task: SonarCloudPublish@1
+        displayName: Publish Sonarqube Analysis
+        inputs:
+          pollingTimeoutSec: '300'
+
+
