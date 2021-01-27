@@ -29,6 +29,10 @@ variables:
   sqlserver_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.SqlServer'
   sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
 
+  execute_sonarcloud: 'true'
+  sonarcloud_project: 'AspnetStandard.Diagnostics.Healthchecks'
+  sonarcloud_organization: 'andrepostiga-github'
+  sonarcloud_account: 'andrepostiga'
 
 trigger:
 - main
@@ -127,7 +131,28 @@ stages:
           testResultsFormat: 'XUnit'
           testResultsFiles: '$(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results/result.xunit.xml'
           testRunTitle: 'Collecting Test Results'
-    
+  - job: QA
+    dependsOn: 
+      - Build
+      - UnitTests
+    condition: |
+      and
+      (
+        in(dependencies.Build.result, 'Succeeded', 'Skipped'),
+        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
+        eq(variables['execute_sonarcloud'], 'true')
+      )
+    workspace:
+      clean: all
+    variables:
+      OpencoverSonar: $[ dependencies.UnitTests.outputs['UnitTestsTask.OpencoverSonar'] ]
+    steps:
+      - task: DownloadPipelineArtifact@2
+        displayName: Get Unit Test Result
+        condition: eq(variables['execute_test'], 'true')
+        inputs:
+          artifact: UnitTestResults
+      
 
 
 
