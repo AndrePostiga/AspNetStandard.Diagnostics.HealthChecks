@@ -32,7 +32,7 @@ variables:
   execute_sonarcloud: 'true'
   sonarcloud_project: 'AndrePostiga_AspNetStandard.Diagnostics.HealthChecks'
   sonarcloud_organization: 'andrepostiga-github'
-  sonarcloud_account: 'andrepostiga'
+  sonarcloud_account: 'SonarCloudAndre'
 
 trigger:
 - main
