@@ -152,7 +152,29 @@ stages:
         condition: eq(variables['execute_test'], 'true')
         inputs:
           artifact: UnitTestResults
+      - task: SonarCloudPrepare@1
+        displayName: Start Sonarqube Analysis
+        inputs:
+          SonarCloud: '$(sonarcloud_account)'
+          organization: '$(sonarcloud_organization)'
+          scannerMode: 'MSBuild'
+          projectKey: '$(sonarcloud_project)'
+          projectName: '$(project_name)'
+          extraProperties: |
+            sonar.sourceEncoding=UTF-8
+            sonar.scm.forceReloadAll=true
+            $(OpencoverSonar)
+      - script: |
+          dotnet build "$(solution_path)"
+        displayName: Running Build for QA
+      - task: SonarCloudAnalyze@1
+        displayName: Finish Sonarqube Analysis
+      - task: SonarCloudPublish@1
+        displayName: Publish Sonarqube Analysis
+        inputs:
+          pollingTimeoutSec: '300'
       
+        
 
 
 
