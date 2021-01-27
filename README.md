@@ -1,3 +1,11 @@
+
+
+[![Nuget Version](https://img.shields.io/nuget/v/AspNetStandard.Diagnostics.HealthChecks?style=plastic)](https://www.nuget.org/packages/AspNetStandard.Diagnostics.HealthChecks/)
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=AndrePostiga_AspNetStandard.Diagnostics.HealthChecks&metric=alert_status)](https://sonarcloud.io/dashboard?id=AndrePostiga_AspNetStandard.Diagnostics.HealthChecks)
+
+
+
 `AspnetStandard.Diagnostics.HealthCheck`
 ------------------------------
 
