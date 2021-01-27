@@ -85,6 +85,48 @@ stages:
       inputs:
         path: $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)
         artifact: $(sqlserver_extension_name)
+  - job: UnitTests
+    dependsOn:
+    - Build    
+    workspace:
+      clean: all
+    condition: and(succeeded(), eq(variables['execute_test'], 'true'))
+    steps:
+      - script: |
+          dotnet tool install --global coverlet.console 
+          dotnet tool install dotnet-reportgenerator-globaltool --tool-path . 
+          dotnet add $(test_project_path) package coverlet.msbuild
+          dotnet add $(test_project_path) package XunitXml.TestLogger
+          dotnet test /p:CollectCoverage=true \
+                      /p:CoverletOutputFormat=\"opencover,cobertura\" \
+                      /p:CoverletOutput=results/result \
+                      /p:Exclude=[xunit.*]* "$(solution_path)" \
+                      --test-adapter-path:. --logger:"xunit;LogFilePath=results/result.xunit.xml"
+          ./reportgenerator "-reports:$(test_project_base_folder)/results/result.opencover.xml" \
+                            "-targetdir:$(test_project_base_folder)/results/Cobertura" \
+                            "-reporttypes:Cobertura;HTMLInline;HTMLChart"
+          echo "##vso[task.setvariable variable=OpencoverSonar;isOutput=true]sonar.cs.opencover.reportsPaths=$(Pipeline.Workspace)/result.opencover.xml"
+          ls $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results
+        displayName: Running Unit Tests
+        name: UnitTestsTask
+      - task: PublishPipelineArtifact@1
+        displayName: Store Test Result
+        inputs:
+          path: $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results
+          artifact: UnitTestResults
+      - task: PublishCodeCoverageResults@1
+        displayName: Publish Code Coverage 
+        inputs:
+          codeCoverageTool: 'Cobertura'
+          summaryFileLocation: $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results/result.cobertura.xml
+          pathToSources: .
+          failIfCoverageEmpty: true
+      - task: PublishTestResults@2
+        displayName: Publish Test Result
+        inputs:
+          testResultsFormat: 'XUnit'
+          testResultsFiles: '$(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results/result.xunit.xml'
+          testRunTitle: 'Collecting Test Results'
     
 
 
