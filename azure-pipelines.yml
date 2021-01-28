@@ -35,12 +35,13 @@ variables:
   sonarcloud_account: 'SonarCloudAndre'
 
 trigger:
-- main
+- dev
 - master
 
 pr:
   branches:
     include:
+    - dev
     - master
 
 pool:
@@ -138,8 +139,8 @@ stages:
     condition: |
       and
       (
-        in(dependencies.Build.result, 'Succeeded', 'Skipped'),
-        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
+        eq(dependencies.Build.result, 'Succeeded'),
+        eq(dependencies.UnitTests.result, 'Succeeded'),
         eq(variables['execute_sonarcloud'], 'true')
       )
     workspace:
@@ -173,5 +174,64 @@ stages:
         displayName: Publish Sonarqube Analysis
         inputs:
           pollingTimeoutSec: '300'
-
-
+  - job: PackingNuget
+    dependsOn:
+    - Build
+    - UnitTests
+    - QA
+    workspace:
+      clean: all
+    condition: |
+      and
+      (        
+        eq(dependencies.Build.result, 'Succeeded'),
+        eq(dependencies.UnitTests.result, 'Succeeded'),
+        eq(dependencies.QualityAnalysis.result, 'Succeeded'),
+      )
+    steps:
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'pack'
+          packagesToPack: '$(project_path)'
+          nobuild: true
+          versioningScheme: 'byPrereleaseNumber'
+          majorVersion: '1'
+          minorVersion: '0'
+          patchVersion: '0'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'pack'
+          packagesToPack: '$(redis_extension_path)'
+          nobuild: true
+          versioningScheme: 'byPrereleaseNumber'
+          majorVersion: '1'
+          minorVersion: '0'
+          patchVersion: '0'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'pack'
+          packagesToPack: '$(mongo_extension_path)'
+          nobuild: true
+          versioningScheme: 'byPrereleaseNumber'
+          majorVersion: '1'
+          minorVersion: '0'
+          patchVersion: '0'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'pack'
+          packagesToPack: '$(rabbitmq_extension_path)'
+          nobuild: true
+          versioningScheme: 'byPrereleaseNumber'
+          majorVersion: '1'
+          minorVersion: '0'
+          patchVersion: '0'
+      - task: DotNetCoreCLI@2
+        inputs:
+          command: 'pack'
+          packagesToPack: '$(sqlserver_extension_path)'
+          nobuild: true
+          versioningScheme: 'byPrereleaseNumber'
+          majorVersion: '1'
+          minorVersion: '0'
+          patchVersion: '0'
+      
