@@ -186,7 +186,7 @@ stages:
       (        
         eq(dependencies.Build.result, 'Succeeded'),
         eq(dependencies.UnitTests.result, 'Succeeded'),
-        eq(dependencies.QualityAnalysis.result, 'Succeeded'),
+        eq(dependencies.QualityAnalysis.result, 'Succeeded')
       )
     steps:
       - task: DotNetCoreCLI@2
