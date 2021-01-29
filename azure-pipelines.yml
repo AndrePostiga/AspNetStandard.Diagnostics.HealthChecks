@@ -237,10 +237,10 @@ stages:
     condition: |
       and
       (
-        eq(dependencies.UpdateBuildVersion.result, 'Succeeded'),
+        eq(dependencies.PreBuild.result, 'Succeeded'),
         in(dependencies.Build.result, 'Succeeded', 'Skipped'),
         in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
-        in(dependencies.QualityAnalysis.result, 'Succeeded', 'Skipped'),
+        in(dependencies.QA.result, 'Succeeded', 'Skipped'),
         or
         (
           contains(variables['Build.SourceBranch'], '/hotfix/'),
