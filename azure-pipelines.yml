@@ -306,8 +306,6 @@ stages:
         contains(variables['Build.SourceBranch'], '/tags/')
       )
     )
-  variables:
-    - group: NugetCredentials
   jobs:
   - job: PublishNugetPackages
     steps:
