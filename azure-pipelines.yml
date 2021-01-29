@@ -35,8 +35,14 @@ variables:
   sonarcloud_account: 'SonarCloudAndre'
 
 trigger:
-- dev
-- master
+  branches:
+    include:
+    - release/*  
+    - hotfix/*
+    - dev
+  tags:
+    include: 
+    - '*'
 
 pr:
   branches:
@@ -44,13 +50,54 @@ pr:
     - dev
     - master
 
+
 pool:
   vmImage: 'ubuntu-latest'
 
 stages:
 - stage: BuildApp
   jobs:
+  - job: PreBuild
+    workspace:
+      clean: all
+    variables:
+      current_counter: $[counter(variables['Build.SourceBranchName'], 1)] 
+      #Branch name is the last path segment in the ref ex: refs/heads/release/1.0.1 will be 1.0.1
+    steps:
+    - bash: |
+        if [[ "$(Build.SourceVersionMessage)" =~ "hotfix/" ]];
+        then 
+            echo "##vso[task.setvariable variable=IsHotfix;isOutput=true]true"
+            echo "##vso[task.setvariable variable=PreviousPrefix;isOutput=true]hotfix"
+        else
+            echo "##vso[task.setvariable variable=IsHotfix;isOutput=true]false"
+            echo "##vso[task.setvariable variable=PreviousPrefix;isOutput=true]release"
+        fi
+        if [[ "$(Build.SourceBranch)" =~ "/hotfix/" ]] || [[ "$(Build.SourceBranch)" =~ "/release/" ]]; 
+        then
+            echo "Generate Preview Release Version"
+            echo "Version: $(Build.SourceBranchName)"
+            echo "         $(Build.SourceBranchName)-preview.$(current_counter)"
+            echo "##vso[build.updatebuildnumber]$(Build.SourceBranchName)-preview.$(current_counter)"
+            echo "##vso[task.setvariable variable=PureVersion;isOutput=true]$(Build.SourceBranchName)"
+        elif [[ "$(Build.SourceBranch)" =~ "/tags/" ]];
+        then
+            echo "Generate Release Version"
+            echo "Version: $(Build.SourceBranchName)"
+            echo "##vso[build.updatebuildnumber]$(Build.SourceBranchName)"
+            echo "##vso[task.setvariable variable=SonarMasterWhenTag;isOutput=true]sonar.branch.name=master"
+            echo "##vso[task.setvariable variable=PureVersion;isOutput=true]$(Build.SourceBranchName)"
+        else
+            echo "Generate Development Version"
+            echo "##vso[build.updatebuildnumber]$(Build.BuildNumber)-develop"
+            echo "Version: $(Build.BuildNumber)-develop"
+        fi
+      displayName: Update Version Number
+      name: UpdateBuildVersionTask    
   - job: Build
+    dependsOn: 
+    - PreBuild
+    condition: succeeded()
     workspace:
       clean: all      
     steps:
@@ -92,6 +139,7 @@ stages:
         artifact: $(sqlserver_extension_name)
   - job: UnitTests
     dependsOn:
+    - PreBuild
     - Build    
     workspace:
       clean: all
@@ -134,18 +182,21 @@ stages:
           testRunTitle: 'Collecting Test Results'
   - job: QA
     dependsOn: 
+      - PreBuild
       - Build
       - UnitTests
     condition: |
       and
       (
-        eq(dependencies.Build.result, 'Succeeded'),
-        eq(dependencies.UnitTests.result, 'Succeeded'),
+        in(dependencies.PreBuild.result, 'Succeeded'),
+        in(dependencies.Build.result, 'Succeeded', 'Skipped'),
+        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
         eq(variables['execute_sonarcloud'], 'true')
       )
     workspace:
       clean: all
     variables:
+      SonarMasterWhenTag: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.SonarMasterWhenTag'] ]
       OpencoverSonar: $[ dependencies.UnitTests.outputs['UnitTestsTask.OpencoverSonar'] ]
     steps:
       - task: DownloadPipelineArtifact@2
@@ -165,6 +216,7 @@ stages:
             sonar.sourceEncoding=UTF-8
             sonar.scm.forceReloadAll=true
             $(OpencoverSonar)
+            $(SonarMasterWhenTag)
       - script: |
           dotnet build "$(solution_path)"
         displayName: Running Build for QA
@@ -176,6 +228,7 @@ stages:
           pollingTimeoutSec: '300'
   - job: PackingNuget
     dependsOn:
+    - PreBuild
     - Build
     - UnitTests
     - QA
@@ -183,55 +236,54 @@ stages:
       clean: all
     condition: |
       and
-      (        
-        eq(dependencies.Build.result, 'Succeeded'),
-        eq(dependencies.UnitTests.result, 'Succeeded'),
-        eq(dependencies.QA.result, 'Succeeded')
+      (
+        eq(dependencies.UpdateBuildVersion.result, 'Succeeded'),
+        in(dependencies.Build.result, 'Succeeded', 'Skipped'),
+        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
+        in(dependencies.QualityAnalysis.result, 'Succeeded', 'Skipped'),
+        or
+        (
+          contains(variables['Build.SourceBranch'], '/hotfix/'),
+          contains(variables['Build.SourceBranch'], '/release/'),
+          contains(variables['Build.SourceBranch'], '/tags/')
+        )
       )
+    variables:
+      ReleaseVersion: $(Build.BuildNumber) 
+      PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
     steps:
       - task: DotNetCoreCLI@2
+        displayName: 'Packing HC Release'
         inputs:
-          command: 'pack'
-          packagesToPack: '$(project_path)'
-          nobuild: true
-          versioningScheme: 'byPrereleaseNumber'
-          majorVersion: '1'
-          minorVersion: '0'
-          patchVersion: '0'
+          command: custom
+          projects: $(project_path)
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
       - task: DotNetCoreCLI@2
+        displayName: 'Packing Redis Release'
         inputs:
-          command: 'pack'
-          packagesToPack: '$(redis_extension_path)'
-          nobuild: true
-          versioningScheme: 'byPrereleaseNumber'
-          majorVersion: '1'
-          minorVersion: '0'
-          patchVersion: '0'
+          command: custom
+          projects: $(redis_extension_path)
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
       - task: DotNetCoreCLI@2
+        displayName: 'Packing Mongo Extension Release'
         inputs:
-          command: 'pack'
-          packagesToPack: '$(mongo_extension_path)'
-          nobuild: true
-          versioningScheme: 'byPrereleaseNumber'
-          majorVersion: '1'
-          minorVersion: '0'
-          patchVersion: '0'
+          command: custom
+          projects: $(mongo_extension_path)
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
       - task: DotNetCoreCLI@2
+        displayName: 'Packing RabbitMQ Extension Release'
         inputs:
-          command: 'pack'
-          packagesToPack: '$(rabbitmq_extension_path)'
-          nobuild: true
-          versioningScheme: 'byPrereleaseNumber'
-          majorVersion: '1'
-          minorVersion: '0'
-          patchVersion: '0'
+          command: custom
+          projects: $(rabbitmq_extension_path)
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
       - task: DotNetCoreCLI@2
+        displayName: 'Packing SQLServer Extension Release'
         inputs:
-          command: 'pack'
-          packagesToPack: '$(sqlserver_extension_path)'
-          nobuild: true
-          versioningScheme: 'byPrereleaseNumber'
-          majorVersion: '1'
-          minorVersion: '0'
-          patchVersion: '0'
-      
+          command: custom
+          projects: $(sqlserver_extension_path)
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
