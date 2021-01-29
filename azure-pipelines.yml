@@ -303,7 +303,7 @@ stages:
       (
         contains(variables['Build.SourceBranch'], '/hotfix/'),
         contains(variables['Build.SourceBranch'], '/release/'),
-        contains(variables['Build.SourceBranch'], '/tags/'),
+        contains(variables['Build.SourceBranch'], '/tags/')
       )
     )
   variables:
