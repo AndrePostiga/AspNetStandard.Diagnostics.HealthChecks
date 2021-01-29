@@ -287,3 +287,79 @@ stages:
           projects: $(sqlserver_extension_path)
           custom: 'pack'
           arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+      - task: PublishPipelineArtifact@1
+        displayName: Store Nuget Packages
+        inputs:
+          path: $(Build.ArtifactStagingDirectory)
+          artifact: NugetPackage
+
+- stage: PublishPackage
+  dependsOn: BuildApp
+  condition: |
+    and
+    (
+      succeeded(),
+      or
+      (
+        contain(variables['Build.SourceBranch'], '/hotfix/'),
+        contain(variables['Build.SourceBranch'], '/release/'),
+        contain(variables['Build.SourceBranch'], '/tags/'),
+      )
+    )
+  variables:
+    - group: NugetCredentials
+  jobs:
+  - job: PublishNugetPackages
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: Get HealthCheck Artifact
+      inputs:
+        artifact: NugetPackage
+    - task: DotNetCoreCLI@2
+      displayName: Publish HealthCheck package on nuget.org
+      inputs:
+        command: custom
+        custom: nuget
+        arguments: >
+          push $(Pipeline.Workspace)/$(project_name).$(Build.BuildNumber).nupkg
+          -s $(NugetPushUrl)
+          -k $(NugetApiKey)
+    - task: DotNetCoreCLI@2
+      displayName: Publish Redis extension package on nuget.org
+      inputs:
+        command: custom
+        custom: nuget
+        arguments: >
+          push $(Pipeline.Workspace)/$(redis_extension_name).$(Build.BuildNumber).nupkg
+          -s $(NugetPushUrl)
+          -k $(NugetApiKey)
+    - task: DotNetCoreCLI@2
+      displayName: Publish Mongo extension package on nuget.org
+      inputs:
+        command: custom
+        custom: nuget
+        arguments: >
+          push $(Pipeline.Workspace)/$(mongo_extension_name).$(Build.BuildNumber).nupkg
+          -s $(NugetPushUrl)
+          -k $(NugetApiKey)
+    - task: DotNetCoreCLI@2
+      displayName: Publish RabbitMq extension package on nuget.org
+      inputs:
+        command: custom
+        custom: nuget
+        arguments: >
+          push $(Pipeline.Workspace)/$(rabbitmq_extension_name).$(Build.BuildNumber).nupkg
+          -s $(NugetPushUrl)
+          -k $(NugetApiKey)
+    - task: DotNetCoreCLI@2
+      displayName: Publish SqlServer extension package on nuget.org
+      inputs:
+        command: custom
+        custom: nuget
+        arguments: >
+          push $(Pipeline.Workspace)/$(sqlserver_extension_name).$(Build.BuildNumber).nupkg
+          -s $(NugetPushUrl)
+          -k $(NugetApiKey)
+
+      
+  
