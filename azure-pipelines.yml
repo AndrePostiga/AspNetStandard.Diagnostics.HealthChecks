@@ -256,7 +256,7 @@ stages:
       displayName: 'Packing HC Release'
       inputs:
         command: 'custom'
-        packagesToPack: '$(project_path)'
+        projects: '$(project_path)'
         custom: 'pack'
         arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'        
     
