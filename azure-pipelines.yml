@@ -256,41 +256,42 @@ stages:
       displayName: 'Packing HC Release'
       inputs:
         command: 'pack'
-        packagesToPack: '$(project_path)'
+        packagesToPack: $(project_path)
         versioningScheme: 'byEnvVar'
-        versionEnvVar: '$(PureVersion)'
+        versionEnvVar: $(PureVersion)
         buildProperties: 'PackageVersion=$(ReleaseVersion)' 
     - task: NuGetCommand@2
       displayName: 'Packing Redis Release'
       inputs:
         command: 'pack'
-        packagesToPack: '$(redis_extension_path)'
+        packagesToPack: $(redis_extension_path)
         versioningScheme: 'byEnvVar'
-        versionEnvVar: '$(PureVersion)'
-        buildProperties: 'PackageVersion=$(ReleaseVersion)' 
+        versionEnvVar: $(PureVersion)
+        buildProperties: 'PackageVersion=$(ReleaseVersion);Configuration=Release' 
+
     - task: NuGetCommand@2
       displayName: 'Packing Mongo Extension Release'
       inputs:
         command: 'pack'
-        packagesToPack: '$(mongo_extension_path)'
+        packagesToPack: $(mongo_extension_path)
         versioningScheme: 'byEnvVar'
-        versionEnvVar: '$(PureVersion)'
+        versionEnvVar: $(PureVersion)
         buildProperties: 'PackageVersion=$(ReleaseVersion)' 
     - task: NuGetCommand@2
       displayName: 'Packing RabbitMQ Extension Release'
       inputs:
         command: 'pack'
-        packagesToPack: '$(rabbitmq_extension_path)'
+        packagesToPack: $(rabbitmq_extension_path)
         versioningScheme: 'byEnvVar'
-        versionEnvVar: '$(PureVersion)'
+        versionEnvVar: $(PureVersion)
         buildProperties: 'PackageVersion=$(ReleaseVersion)' 
     - task: NuGetCommand@2
       displayName: 'Packing SQLServer Extension Release'
       inputs:
         command: 'pack'
-        packagesToPack: '$(sqlserver_extension_path)'
+        packagesToPack: $(sqlserver_extension_path)
         versioningScheme: 'byEnvVar'
-        versionEnvVar: '$(PureVersion)'
+        versionEnvVar: $(PureVersion)
         buildProperties: 'PackageVersion=$(ReleaseVersion)'      
     - task: PublishPipelineArtifact@1
       displayName: Store Nuget Packages
