@@ -52,7 +52,8 @@ pr:
 
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: 'windows-latest'
+  #vmImage: 'ubuntu-latest'
 
 stages:
 - stage: BuildApp
