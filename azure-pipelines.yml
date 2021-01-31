@@ -9,9 +9,9 @@ variables:
 
   net_version: 'netstandard2.0'
   execute_test: 'true'
-  test_project_base_folder: 'src\AspNetStandard.Diagnostics.HealthChecks.Tests'
-  test_project_path: 'src\AspNetStandard.Diagnostics.HealthChecks.Tests\AspNetStandard.Diagnostics.HealthChecks.Tests.csproj'  
-  solution_path: 'src\AspNetStandard.Diagnostics.HealthChecks.sln'
+  test_project_base_folder: 'src/AspNetStandard.Diagnostics.HealthChecks.Tests'
+  test_project_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Tests/AspNetStandard.Diagnostics.HealthChecks.Tests.csproj'  
+  solution_path: 'src/AspNetStandard.Diagnostics.HealthChecks.sln'
 
   project_name: 'AspNetStandard.Diagnostics.HealthChecks'
   redis_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.Redis'
@@ -19,11 +19,11 @@ variables:
   rabbitmq_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.RabbitMq'
   sqlserver_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.SqlServer'
 
-  project_path: 'src\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj'
-  redis_extension_path: 'src\AspNetStandard.Diagnostics.HealthChecks.Redis\AspNetStandard.Diagnostics.HealthChecks.Redis.csproj'
-  mongo_extension_path: 'src\AspNetStandard.Diagnostics.HealthChecks.MongoDb\AspNetStandard.Diagnostics.HealthChecks.MongoDb.csproj'
-  rabbitmq_extension_path: 'src\AspNetStandard.Diagnostics.HealthChecks.RabbitMq\AspNetStandard.Diagnostics.HealthChecks.RabbitMq.csproj'
-  sqlserver_extension_path: 'src\AspNetStandard.Diagnostics.HealthChecks.SqlServer\AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
+  project_path: 'src/AspNetStandard.Diagnostics.HealthChecks/AspNetStandard.Diagnostics.HealthChecks.csproj'
+  redis_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Redis/AspNetStandard.Diagnostics.HealthChecks.Redis.csproj'
+  mongo_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.MongoDb/AspNetStandard.Diagnostics.HealthChecks.MongoDb.csproj'
+  rabbitmq_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.RabbitMq/AspNetStandard.Diagnostics.HealthChecks.RabbitMq.csproj'
+  sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
 
   execute_sonarcloud: 'true'
   sonarcloud_project: 'AndrePostiga_AspNetStandard.Diagnostics.HealthChecks'
@@ -48,8 +48,8 @@ pr:
 
 
 pool:
-  vmImage: 'windows-latest'
-  #vmImage: 'ubuntu-latest'
+  #vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 stages:
 - stage: BuildApp
@@ -156,7 +156,7 @@ stages:
                             "-targetdir:$(test_project_base_folder)/results/Cobertura" \
                             "-reporttypes:Cobertura;HTMLInline;HTMLChart"
           echo "##vso[task.setvariable variable=OpencoverSonar;isOutput=true]sonar.cs.opencover.reportsPaths=$(Pipeline.Workspace)/result.opencover.xml"
-          ls $(System.DefaultWorkingDirectory)\$(test_project_base_folder)\results
+          ls $(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results
         displayName: Running Unit Tests
         name: UnitTestsTask
       - task: PublishPipelineArtifact@1
