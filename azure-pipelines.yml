@@ -252,46 +252,36 @@ stages:
       ReleaseVersion: $(Build.BuildNumber) 
       PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
     steps:
-    - task: NuGetCommand@2
+    - task: DotNetCoreCLI@2
       displayName: 'Packing HC Release'
       inputs:
-        command: 'pack'
-        packagesToPack: $(project_path)
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: 'PureVersion'
-        buildProperties: 'PackageVersion=$(ReleaseVersion)' 
-    - task: NuGetCommand@2
+        command: pack
+        projects: $(project_path)
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+    - task: DotNetCoreCLI@2
       displayName: 'Packing Redis Release'
       inputs:
-        command: 'pack'
-        packagesToPack: $(redis_extension_path)
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: 'PureVersion'
-        buildProperties: 'PackageVersion=$(ReleaseVersion);Configuration=Release' 
-    - task: NuGetCommand@2
+        command: pack
+        projects: $(redis_extension_path)
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+    - task: DotNetCoreCLI@2
       displayName: 'Packing Mongo Extension Release'
       inputs:
-        command: 'pack'
-        packagesToPack: $(mongo_extension_path)
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: 'PureVersion'
-        buildProperties: 'PackageVersion=$(ReleaseVersion)' 
-    - task: NuGetCommand@2
+        command: pack
+        projects: $(mongo_extension_path)
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+    - task: DotNetCoreCLI@2
       displayName: 'Packing RabbitMQ Extension Release'
       inputs:
-        command: 'pack'
-        packagesToPack: $(rabbitmq_extension_path)
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: 'PureVersion'
-        buildProperties: 'PackageVersion=$(ReleaseVersion)' 
-    - task: NuGetCommand@2
+        command: pack
+        projects: $(rabbitmq_extension_path)
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+    - task: DotNetCoreCLI@2
       displayName: 'Packing SQLServer Extension Release'
       inputs:
-        command: 'pack'
-        packagesToPack: $(sqlserver_extension_path)
-        versioningScheme: 'byEnvVar'
-        versionEnvVar: 'PureVersion'
-        buildProperties: 'PackageVersion=$(ReleaseVersion)'      
+        command: pack
+        projects: $(sqlserver_extension_path)
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'      
     - task: PublishPipelineArtifact@1
       displayName: Store Nuget Packages
       inputs:
