@@ -252,11 +252,13 @@ stages:
       ReleaseVersion: $(Build.BuildNumber) 
       PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
     steps:
+    - script: |
+          dotnet build "$(solution_path)"
+      displayName: Running Build for Packing
     - task: DotNetCoreCLI@2
       displayName: 'Packing HC Release'
       inputs:
         command: 'custom'
-        nobuild: false
         projects: '$(project_path)'
         custom: 'pack'
         arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'        
