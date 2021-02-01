@@ -267,30 +267,34 @@ stages:
     - task: DotNetCoreCLI@2
       displayName: 'Packing Redis Release'
       inputs:
-        command: 'pack'
-        packagesToPack: '$(redis_extension_path)'
+        command: 'custom'
+        projects: '$(redis_extension_path)'
+        custom: 'pack'
         arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'        
     
     - task: DotNetCoreCLI@2
       displayName: 'Packing Mongo Extension Release'
       inputs:
-        command: 'pack'
-        packagesToPack: '$(mongo_extension_path)'
-        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+        command: 'custom'
+        projects: '$(mongo_extension_path)'
+        custom: 'pack'
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)' 
 
     - task: DotNetCoreCLI@2
       displayName: 'Packing RabbitMQ Extension Release'
       inputs:
-        command: 'pack'
-        packagesToPack: '$(rabbitmq_extension_path)'
-        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+        command: 'custom'
+        projects: '$(rabbitmq_extension_path)'
+        custom: 'pack'
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)' 
 
     - task: DotNetCoreCLI@2
       displayName: 'Packing SQLServer Extension Release'
       inputs:
-        command: 'pack'
-        packagesToPack: '$(sqlserver_extension_path)'
-        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'      
+        command: 'custom'
+        projects: '$(sqlserver_extension_path)'
+        custom: 'pack'
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'     
 
     - task: PublishPipelineArtifact@1
       displayName: Store Nuget Packages
