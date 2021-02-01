@@ -250,7 +250,7 @@ stages:
       PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
     steps:
     - script: |
-          dotnet publish -c Release "$(solution_path)"                  
+          dotnet publish -c Release "$(project_path)"                  
           dotnet publish -c Release "$(redis_extension_path)"
           dotnet publish -c Release "$(mongo_extension_path)"
           dotnet publish -c Release "$(rabbitmq_extension_path)"
