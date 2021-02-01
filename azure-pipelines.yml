@@ -249,9 +249,9 @@ stages:
       ReleaseVersion: $(Build.BuildNumber) 
       PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
     steps:
-    - script: |
-          dotnet publish -c Release "$(solution_path)"
-      displayName: Running Build for Packing
+    # - script: |
+    #       dotnet publish -c Release "$(solution_path)"
+    #   displayName: Running Build for Packing
     - task: DotNetCoreCLI@2
       displayName: 'Packing HC Release'
       inputs:
