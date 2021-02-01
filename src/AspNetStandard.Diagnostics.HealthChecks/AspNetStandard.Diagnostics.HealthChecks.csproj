@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-	<TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>	  
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Andre Postiga, Kirill Polishchuk</Authors>
     <Company>Andre Postiga, Kirill Polishchuk</Company>
