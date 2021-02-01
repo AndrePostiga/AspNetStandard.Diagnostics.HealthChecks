@@ -250,7 +250,7 @@ stages:
       PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
     steps:
     - script: |
-          dotnet build "$(solution_path)"
+          dotnet publish -c Release "$(solution_path)"
       displayName: Running Build for Packing
     - task: DotNetCoreCLI@2
       displayName: 'Packing HC Release'
