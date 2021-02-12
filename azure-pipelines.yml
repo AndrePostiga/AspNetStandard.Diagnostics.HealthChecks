@@ -48,7 +48,6 @@ pr:
 
 
 pool:
-  #vmImage: 'windows-latest'
   vmImage: 'ubuntu-latest'
 
 stages:
