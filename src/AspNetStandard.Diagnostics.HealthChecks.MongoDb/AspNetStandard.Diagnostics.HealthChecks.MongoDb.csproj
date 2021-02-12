@@ -6,11 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="2.11.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
   </ItemGroup>
 
 </Project>
