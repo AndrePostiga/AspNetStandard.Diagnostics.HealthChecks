@@ -6,11 +6,8 @@
   </PropertyGroup>	 
 
   <ItemGroup>
+    <PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.0.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
   </ItemGroup>
 
 </Project>
