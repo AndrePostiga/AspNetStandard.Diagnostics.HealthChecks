@@ -249,48 +249,15 @@ stages:
       PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
     steps:
     - script: |
-          dotnet publish -c Release "$(solution_path)"               
+          dotnet publish -c Release "$(project_path)"               
       displayName: Running Build for Packing
     - task: DotNetCoreCLI@2
       displayName: 'Packing HC Release'
       inputs:
         command: 'custom'
-        projects: '$(solution_path)'
+        projects: '$(project_path)'
         custom: 'pack'
-        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'      
-    
-    # - task: DotNetCoreCLI@2
-    #   displayName: 'Packing Redis Release'
-    #   inputs:
-    #     command: 'custom'
-    #     projects: '$(redis_extension_path)'
-    #     custom: 'pack'
-    #     arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'        
-    
-    # - task: DotNetCoreCLI@2
-    #   displayName: 'Packing Mongo Extension Release'
-    #   inputs:
-    #     command: 'custom'
-    #     projects: '$(mongo_extension_path)'
-    #     custom: 'pack'
-    #     arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)' 
-
-    # - task: DotNetCoreCLI@2
-    #   displayName: 'Packing RabbitMQ Extension Release'
-    #   inputs:
-    #     command: 'custom'
-    #     projects: '$(rabbitmq_extension_path)'
-    #     custom: 'pack'
-    #     arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)' 
-
-    # - task: DotNetCoreCLI@2
-    #   displayName: 'Packing SQLServer Extension Release'
-    #   inputs:
-    #     command: 'custom'
-    #     projects: '$(sqlserver_extension_path)'
-    #     custom: 'pack'
-    #     arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'     
-
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
     - task: PublishPipelineArtifact@1
       displayName: Store Nuget Packages
       inputs:
