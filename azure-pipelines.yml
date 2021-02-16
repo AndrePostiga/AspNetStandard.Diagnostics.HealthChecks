@@ -372,10 +372,9 @@ stages:
         inputs:
           path: $(Build.ArtifactStagingDirectory)
           artifact: sqlserverPackage
-    
-    
+
 - stage: PublishExtensions
-  dependsOn: PackingExtensions
+  dependsOn: PackExtensions
   condition: |
     and
     (
