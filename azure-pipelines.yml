@@ -6,7 +6,7 @@
 variables:
   organization: 'AndrePostiga'
   
-  publish_main_app: 'false'
+  publish_main_app: 'true'
   publish_extensions: 'true'
 
   net_version: 'netstandard2.0'
