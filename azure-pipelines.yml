@@ -298,7 +298,9 @@ stages:
           -k $(NugetApiKey)
 
 - stage: PackExtensions
-  dependsOn: PublishMainHc
+  dependsOn: 
+  - BuildApp
+  - PublishMainHc
   condition: |
     and
     (
@@ -312,7 +314,7 @@ stages:
     )
   variables:
     ReleaseVersion: $(Build.BuildNumber) 
-    PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
+    PureVersion: $[ stageDependencies.BuildApp.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
   jobs:
     - job: PackingExtensions
       steps:
