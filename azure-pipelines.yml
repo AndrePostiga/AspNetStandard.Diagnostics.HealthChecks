@@ -6,7 +6,7 @@
 variables:
   organization: 'AndrePostiga'
   
-  publish: 'false'
+  publish: 'true'
 
   net_version: 'netstandard2.0'
   execute_test: 'true'
