@@ -6,6 +6,7 @@
 variables:
   organization: 'AndrePostiga'
   
+  publish: 'false'
 
   net_version: 'netstandard2.0'
   execute_test: 'true'
@@ -262,13 +263,14 @@ stages:
       displayName: Store Nuget Packages
       inputs:
         path: $(Build.ArtifactStagingDirectory)
-        artifact: NugetPackage
+        artifact: HcNugetPackage
 
-- stage: PublishPackage
+- stage: PublishMainHc
   dependsOn: BuildApp
   condition: |
     and
     (
+      eq(variables['publish'], 'true'),
       succeeded(),
       or
       (
@@ -278,12 +280,12 @@ stages:
       )
     )
   jobs:
-  - job: PublishNugetPackages
+  - job: PublishHCNugetPackage
     steps:
     - task: DownloadPipelineArtifact@2
       displayName: Get HealthCheck Artifact
       inputs:
-        artifact: NugetPackage
+        artifact: HcNugetPackage
     - task: DotNetCoreCLI@2
       displayName: Publish HealthCheck package on nuget.org
       inputs:
@@ -293,8 +295,110 @@ stages:
           push $(Pipeline.Workspace)/$(project_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+
+- stage: PackingExtensions
+  jobs:
+  - job: PackingExtensions
+    dependsOn: PublishMainHc
+    workspace:
+      clean: all
+    condition: |
+      and
+      (
+        succeeded(),
+        or
+        (
+          contains(variables['Build.SourceBranch'], '/hotfix/'),
+          contains(variables['Build.SourceBranch'], '/release/'),
+          contains(variables['Build.SourceBranch'], '/tags/')
+        )
+      )
+    variables:
+      ReleaseVersion: $(Build.BuildNumber) 
+      PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
+    steps:
+    - script: |
+          dotnet publish -c Release "$(redis_extension_path)"               
+          dotnet publish -c Release "$(mongo_extension_path)"  
+          dotnet publish -c Release "$(rabbitmq_extension_path)"  
+          dotnet publish -c Release "$(sqlserver_extension_path)"  
+      displayName: Running Build for Packing    
     - task: DotNetCoreCLI@2
-      displayName: Publish Redis extension package on nuget.org
+      displayName: 'Packing redisExtension Release'
+      inputs:
+        command: 'custom'
+        projects: '$(redis_extension_path)'
+        custom: 'pack'
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+    - task: PublishPipelineArtifact@1
+      displayName: Store redisExtension Package
+      inputs:
+        path: $(Build.ArtifactStagingDirectory)
+        artifact: redisPackage
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Packing mongoExtension Release'
+      inputs:
+        command: 'custom'
+        projects: '$(mongo_extension_path)'
+        custom: 'pack'
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'    
+    - task: PublishPipelineArtifact@1
+      displayName: Store mongoExtension Package
+      inputs:
+        path: $(Build.ArtifactStagingDirectory)
+        artifact: mongoPackage
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Packing rabbitmqExtension Release'
+      inputs:
+        command: 'custom'
+        projects: '$(rabbitmq_extension_path)'
+        custom: 'pack'
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+    - task: PublishPipelineArtifact@1
+      displayName: Store rabbitmqExtension Package
+      inputs:
+        path: $(Build.ArtifactStagingDirectory)
+        artifact: rabbitmqPackage
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Packing sqlserverExtension Release'
+      inputs:
+        command: 'custom'
+        projects: '$(sqlserver_extension_path)'
+        custom: 'pack'
+        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+    - task: PublishPipelineArtifact@1
+      displayName: Store sqlserverExtension Packages
+      inputs:
+        path: $(Build.ArtifactStagingDirectory)
+        artifact: sqlserverPackage
+    
+    
+- stage: PublishExtensions
+  dependsOn: PackingExtensions
+  condition: |
+    and
+    (
+      eq(variables['publish'], 'true'),
+      succeeded(),
+      or
+      (
+        contains(variables['Build.SourceBranch'], '/hotfix/'),
+        contains(variables['Build.SourceBranch'], '/release/'),
+        contains(variables['Build.SourceBranch'], '/tags/')
+      )
+    )
+  jobs:
+  - job: PublishExtensionsNugetPackages
+    steps:
+    - task: DownloadPipelineArtifact@2
+      displayName: Get redisPackage Artifact
+      inputs:
+        artifact: redisPackage
+    - task: DotNetCoreCLI@2
+      displayName: Publish redisPackage on nuget.org
       inputs:
         command: custom
         custom: nuget
@@ -302,8 +406,13 @@ stages:
           push $(Pipeline.Workspace)/$(redis_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+
+    - task: DownloadPipelineArtifact@2
+      displayName: Get mongoPackage Artifact
+      inputs:
+        artifact: mongoPackage
     - task: DotNetCoreCLI@2
-      displayName: Publish Mongo extension package on nuget.org
+      displayName: Publish mongoPackage on nuget.org
       inputs:
         command: custom
         custom: nuget
@@ -311,8 +420,13 @@ stages:
           push $(Pipeline.Workspace)/$(mongo_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+  
+    - task: DownloadPipelineArtifact@2
+      displayName: Get rabbitmqPackage Artifact
+      inputs:
+        artifact: rabbitmqPackage
     - task: DotNetCoreCLI@2
-      displayName: Publish RabbitMq extension package on nuget.org
+      displayName: Publish rabbitmqPackage on nuget.org
       inputs:
         command: custom
         custom: nuget
@@ -320,8 +434,13 @@ stages:
           push $(Pipeline.Workspace)/$(rabbitmq_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+
+    - task: DownloadPipelineArtifact@2
+      displayName: Get sqlserverPackage Artifact
+      inputs:
+        artifact: sqlserverPackage
     - task: DotNetCoreCLI@2
-      displayName: Publish SqlServer extension package on nuget.org
+      displayName: Publish sqlserverPackage on nuget.org
       inputs:
         command: custom
         custom: nuget
@@ -329,6 +448,3 @@ stages:
           push $(Pipeline.Workspace)/$(sqlserver_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
-
-      
-  
