@@ -296,84 +296,82 @@ stages:
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
 
-- stage: PackingExtensions
-  jobs:
-  - job: PackingExtensions
-    dependsOn: PublishMainHc
-    workspace:
-      clean: all
-    condition: |
-      and
+- stage: PackExtensions
+  dependsOn: PublishMainHc
+  condition: |
+    and
+    (
+      succeeded(),
+      or
       (
-        succeeded(),
-        or
-        (
-          contains(variables['Build.SourceBranch'], '/hotfix/'),
-          contains(variables['Build.SourceBranch'], '/release/'),
-          contains(variables['Build.SourceBranch'], '/tags/')
-        )
+        contains(variables['Build.SourceBranch'], '/hotfix/'),
+        contains(variables['Build.SourceBranch'], '/release/'),
+        contains(variables['Build.SourceBranch'], '/tags/')
       )
-    variables:
-      ReleaseVersion: $(Build.BuildNumber) 
-      PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
-    steps:
-    - script: |
-          dotnet publish -c Release "$(redis_extension_path)"               
-          dotnet publish -c Release "$(mongo_extension_path)"  
-          dotnet publish -c Release "$(rabbitmq_extension_path)"  
-          dotnet publish -c Release "$(sqlserver_extension_path)"  
-      displayName: Running Build for Packing    
-    - task: DotNetCoreCLI@2
-      displayName: 'Packing redisExtension Release'
-      inputs:
-        command: 'custom'
-        projects: '$(redis_extension_path)'
-        custom: 'pack'
-        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
-    - task: PublishPipelineArtifact@1
-      displayName: Store redisExtension Package
-      inputs:
-        path: $(Build.ArtifactStagingDirectory)
-        artifact: redisPackage
+    )
+  variables:
+    ReleaseVersion: $(Build.BuildNumber) 
+    PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
+  jobs:
+    - job: PackingExtensions
+      steps:
+      - script: |
+            dotnet publish -c Release "$(redis_extension_path)"               
+            dotnet publish -c Release "$(mongo_extension_path)"  
+            dotnet publish -c Release "$(rabbitmq_extension_path)"  
+            dotnet publish -c Release "$(sqlserver_extension_path)"  
+        displayName: Running Build for Packing    
+      - task: DotNetCoreCLI@2
+        displayName: 'Packing redisExtension Release'
+        inputs:
+          command: 'custom'
+          projects: '$(redis_extension_path)'
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+      - task: PublishPipelineArtifact@1
+        displayName: Store redisExtension Package
+        inputs:
+          path: $(Build.ArtifactStagingDirectory)
+          artifact: redisPackage
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Packing mongoExtension Release'
-      inputs:
-        command: 'custom'
-        projects: '$(mongo_extension_path)'
-        custom: 'pack'
-        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'    
-    - task: PublishPipelineArtifact@1
-      displayName: Store mongoExtension Package
-      inputs:
-        path: $(Build.ArtifactStagingDirectory)
-        artifact: mongoPackage
+      - task: DotNetCoreCLI@2
+        displayName: 'Packing mongoExtension Release'
+        inputs:
+          command: 'custom'
+          projects: '$(mongo_extension_path)'
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'    
+      - task: PublishPipelineArtifact@1
+        displayName: Store mongoExtension Package
+        inputs:
+          path: $(Build.ArtifactStagingDirectory)
+          artifact: mongoPackage
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Packing rabbitmqExtension Release'
-      inputs:
-        command: 'custom'
-        projects: '$(rabbitmq_extension_path)'
-        custom: 'pack'
-        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
-    - task: PublishPipelineArtifact@1
-      displayName: Store rabbitmqExtension Package
-      inputs:
-        path: $(Build.ArtifactStagingDirectory)
-        artifact: rabbitmqPackage
+      - task: DotNetCoreCLI@2
+        displayName: 'Packing rabbitmqExtension Release'
+        inputs:
+          command: 'custom'
+          projects: '$(rabbitmq_extension_path)'
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+      - task: PublishPipelineArtifact@1
+        displayName: Store rabbitmqExtension Package
+        inputs:
+          path: $(Build.ArtifactStagingDirectory)
+          artifact: rabbitmqPackage
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Packing sqlserverExtension Release'
-      inputs:
-        command: 'custom'
-        projects: '$(sqlserver_extension_path)'
-        custom: 'pack'
-        arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
-    - task: PublishPipelineArtifact@1
-      displayName: Store sqlserverExtension Packages
-      inputs:
-        path: $(Build.ArtifactStagingDirectory)
-        artifact: sqlserverPackage
+      - task: DotNetCoreCLI@2
+        displayName: 'Packing sqlserverExtension Release'
+        inputs:
+          command: 'custom'
+          projects: '$(sqlserver_extension_path)'
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+      - task: PublishPipelineArtifact@1
+        displayName: Store sqlserverExtension Packages
+        inputs:
+          path: $(Build.ArtifactStagingDirectory)
+          artifact: sqlserverPackage
     
     
 - stage: PublishExtensions
