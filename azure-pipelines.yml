@@ -6,7 +6,8 @@
 variables:
   organization: 'AndrePostiga'
   
-  publish: 'true'
+  publish_main_app: 'false'
+  publish_extensions: 'true'
 
   net_version: 'netstandard2.0'
   execute_test: 'true'
@@ -270,7 +271,7 @@ stages:
   condition: |
     and
     (
-      eq(variables['publish'], 'true'),
+      eq(variables['publish_main_app'], 'true'),
       succeeded(),
       or
       (
@@ -378,7 +379,7 @@ stages:
   condition: |
     and
     (
-      eq(variables['publish'], 'true'),
+      eq(variables['publish_extensions'], 'true'),
       succeeded(),
       or
       (
