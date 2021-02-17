@@ -6,7 +6,7 @@
 variables:
   organization: 'AndrePostiga'
   
-  publish_main_app: 'true'
+  publish_main_app: 'false'
   publish_extensions: 'true'
 
   net_version: 'netstandard2.0'
@@ -91,7 +91,7 @@ stages:
             echo "Version: $(Build.BuildNumber)-develop"
         fi
       displayName: Update Version Number
-      name: UpdateBuildVersionTask    
+      name: PreBuildTask    
   - job: Build
     dependsOn: 
     - PreBuild
@@ -248,7 +248,7 @@ stages:
       )
     variables:
       ReleaseVersion: $(Build.BuildNumber) 
-      PureVersion: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
+      PureVersion: $[ dependencies.PreBuild.outputs['PreBuildTask.PureVersion'] ]
     steps:
     - script: |
           dotnet publish -c Release "$(project_path)"               
@@ -300,7 +300,6 @@ stages:
 - stage: PackExtensions
   dependsOn: 
   - BuildApp
-  - PublishMainHc
   condition: |
     and
     (
@@ -314,7 +313,7 @@ stages:
     )
   variables:
     ReleaseVersion: $(Build.BuildNumber) 
-    PureVersion: $[ stageDependencies.BuildApp.UpdateBuildVersion.outputs['UpdateBuildVersionTask.PureVersion'] ]
+    PureVersion: $[ stageDependencies.BuildApp.PreBuild.outputs['PreBuildTask.PureVersion'] ]
   jobs:
     - job: PackingExtensions
       steps:
