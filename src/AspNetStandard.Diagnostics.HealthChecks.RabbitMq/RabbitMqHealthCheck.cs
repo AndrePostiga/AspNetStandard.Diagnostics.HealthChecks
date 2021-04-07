@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
 {
-    public class RabbitMqHealthCheck : IHealthCheck
+    public class RabbitMqHealthCheck : IHealthCheck, IDisposable // ToDo: Caso não seja estático, a conexão deve ser encerrada por conta de leak
     {
-        private IConnection _connection;
-        private IConnectionFactory _factory;
-        private readonly Uri _rabbitConnectionString;
-        private readonly SslOption _sslOption;
+        private bool _disposed; // ToDo: Implementei a interface IDisposable
+        private static volatile object _sync = new object(); // ToDo: Fiz uma implementação de multithread
+        private IConnection _connection; // ToDo: Deveria ser estático? Um pool?
+        private readonly IConnectionFactory _factory;
 
         public RabbitMqHealthCheck(IConnection connection)
         {
@@ -23,14 +23,14 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        public RabbitMqHealthCheck(Uri rabbitConnectionString, SslOption ssl = null)
+        public RabbitMqHealthCheck(Uri rabbitConnectionString, SslOption ssl = null) : this(CreateFactory(rabbitConnectionString, ssl))
         {
-            _rabbitConnectionString = rabbitConnectionString;
-            _sslOption = ssl;
         }
 
-        public RabbitMqHealthCheck(string rabbitConnectionString, SslOption ssl = null) : this(new Uri(rabbitConnectionString), ssl)
-        { }
+        public RabbitMqHealthCheck(string rabbitConnectionString, SslOption ssl = null) : this(
+            new Uri(rabbitConnectionString), ssl)
+        {
+        }
 
         public Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
@@ -49,23 +49,50 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
             }
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         private void EnsureConnection()
         {
-            if (_connection == null)
-            {
-                if (_factory == null)
-                {
-                    _factory = new ConnectionFactory()
-                    {
-                        Uri = _rabbitConnectionString,
-                        AutomaticRecoveryEnabled = true,
-                        UseBackgroundThreadsForIO = true,
-                        Ssl = _sslOption ?? new SslOption()
-                    };
-                }
+            if (_connection != null) return;
 
+            lock (_sync)
+            {
+                if (_connection != null) return;
                 _connection = _factory.CreateConnection();
             }
-        }        
+        }
+
+        ~RabbitMqHealthCheck()
+        {
+            Dispose(false);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (_disposed) return;
+            
+            if (disposing)
+            {
+                _connection?.Close();
+                _connection?.Dispose();
+            }
+
+            _disposed = true;
+        }
+
+        private static ConnectionFactory CreateFactory(Uri connectionString, SslOption sslOption)
+        {
+            return new ConnectionFactory()
+            {
+                Uri = connectionString,
+                AutomaticRecoveryEnabled = true,
+                UseBackgroundThreadsForIO = true,
+                Ssl = sslOption ?? new SslOption()
+            };
+        }
     }
 }

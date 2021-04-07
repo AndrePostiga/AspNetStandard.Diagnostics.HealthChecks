@@ -54,7 +54,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             return this;
         }
 
-        internal string ApiKey = null;
+        internal string ApiKey = null; // ToDo: Sendo um atributo, tá fora de padrão. Transformar em propriedade?
 
         public HealthChecksBuilder UseAuthorization(string apiKey)
         {

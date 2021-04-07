@@ -16,21 +16,18 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         {
             get
             {
-                var status = HealthStatus.Healthy;
-                foreach (var healthCheckResultExtended in Entries.Values)
+                // ToDo: Coloquei usando lamba. 
+                if (Entries.Values.Any(x => x.Status == HealthStatus.Unhealthy))
                 {
-                    if (healthCheckResultExtended.Status == HealthStatus.Unhealthy)
-                    {
-                        status = HealthStatus.Unhealthy;
-                        break;
-                    }
-
-                    if (healthCheckResultExtended.Status == HealthStatus.Degraded)
-                    {
-                        status = HealthStatus.Degraded;
-                    }
+                    return HealthStatus.Unhealthy;
                 }
-                return status;
+                
+                if (Entries.Values.Any(x => x.Status == HealthStatus.Degraded))
+                {
+                    return HealthStatus.Degraded;
+                }
+                
+                return HealthStatus.Healthy;
             }
         }
 
