@@ -16,7 +16,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         {
             get
             {
-                // ToDo: Coloquei usando lamba. 
                 if (Entries.Values.Any(x => x.Status == HealthStatus.Unhealthy))
                 {
                     return HealthStatus.Unhealthy;
