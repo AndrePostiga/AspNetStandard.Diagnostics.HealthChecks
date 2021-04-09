@@ -1,5 +1,7 @@
-﻿using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
+using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
+using System.Collections.Generic;
 using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
@@ -8,17 +10,16 @@ namespace AspNetStandard.Diagnostics.HealthChecks
     {
         public static HealthChecksBuilder AddHealthChecks(this HttpConfiguration httpConfiguration, string healthEndpoint = "health")
         {
-            System.Diagnostics.Debug.WriteLine("Iniciei"); // ToDo: Era para isso estar aqui mesmo?
-            var healthChecksBuilder = new HealthChecksBuilder();
+            var hcBuilder = new HealthChecksBuilder();
+            var hcConfig = hcBuilder.Build();
+            var dependencyResolver = httpConfiguration.DependencyResolver;
 
-            var healthChecksService = new HealthCheckService(healthChecksBuilder);
-            var authenticationService = new AuthenticationService(healthChecksBuilder);
+            
 
-            var dependencyHandler = new DependencyHandler(httpConfiguration, healthChecksBuilder);
-            var authenticationHandler = new AuthenticationHandler(authenticationService);
-            var healthCheckHandler = new HealthCheckHandler(healthChecksService);
-
-            dependencyHandler.SetNextHandler(authenticationHandler);
+            var healthChecksService = new HealthCheckService(dependencyResolver, hcConfig.HealthChecksDependencies);
+            var authenticationService = new AuthenticationService(hcConfig.ApiKey);
+            var authenticationHandler = new AuthenticationHandler(hcConfig, authenticationService);
+            var healthCheckHandler = new HealthCheckHandler(hcConfig, healthChecksService);
             authenticationHandler.SetNextHandler(healthCheckHandler);
 
             httpConfiguration.Routes.MapHttpRoute(
@@ -26,10 +27,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks
                 routeTemplate: healthEndpoint,
                 defaults: new { check = RouteParameter.Optional },
                 constraints: null,
-                handler: dependencyHandler
+                handler: authenticationHandler
             );
 
-            return healthChecksBuilder;
+            return hcBuilder;
         }
     }
 }

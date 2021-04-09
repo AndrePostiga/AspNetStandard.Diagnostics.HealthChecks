@@ -5,25 +5,25 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
     internal class AuthenticationService : IAuthenticationService
     {
-        private HealthChecksBuilder _healthChecksBuilder { get; }
-        public string ApiKey { get => _healthChecksBuilder.ApiKey; }
+        private readonly string _apiKey;
 
-        public AuthenticationService(HealthChecksBuilder healthChecksBuilder)
+        public AuthenticationService(string apiKey)
         {
-            _healthChecksBuilder = healthChecksBuilder;
+            _apiKey = apiKey;           
         }
 
         public bool ValidateApiKey(HttpRequestMessage request)
         {
+
             //query.TryGetValue
             var query = request.RequestUri.ParseQueryString();
             string key = query["ApiKey"];
-            return (key == ApiKey);
+            return (key == _apiKey);
         }
 
         public bool NeedAuthentication()
         {
-            return !string.IsNullOrWhiteSpace(ApiKey);
+            return !string.IsNullOrWhiteSpace(_apiKey);
         }
     }
 }

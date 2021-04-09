@@ -12,10 +12,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
     internal class HealthCheckHandler : Handler
     {
         private readonly IHealthCheckService _hcService;
+        private readonly HealthCheckConfiguration _hcConfig;
 
-        public HealthCheckHandler(IHealthCheckService healthCheckService)
+        public HealthCheckHandler(HealthCheckConfiguration healthCheckConfiguration, IHealthCheckService healthCheckService) 
+            : base(healthCheckConfiguration)
         {
             _hcService = healthCheckService;
+            _hcConfig = healthCheckConfiguration;
         }
 
         public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -27,11 +30,11 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                 if (queryParameters.TryGetValue("check", out var check) && !string.IsNullOrWhiteSpace(check))
                 {
                     var healthResult = await _hcService.GetHealthAsync(check, cancellationToken);
-                    return MakeResponse<HealthCheckResultExtended>(healthResult, _hcService.GetStatusCode(healthResult.Status));
+                    return MakeResponse<HealthCheckResultExtended>(healthResult, _hcConfig.GetStatusCode(healthResult.Status));
                 }
 
                 var result = await _hcService.GetHealthAsync(cancellationToken);
-                return MakeResponse<HealthCheckResponse>(result, _hcService.GetStatusCode(result.OverAllStatus));
+                return MakeResponse<HealthCheckResponse>(result, _hcConfig.GetStatusCode(result.OverAllStatus));
             }
             catch (NotFoundError error)
             {

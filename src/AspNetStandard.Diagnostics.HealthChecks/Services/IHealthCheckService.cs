@@ -10,7 +10,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
         Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default);
 
         Task<HealthCheckResultExtended> GetHealthAsync(string healthCheckName, CancellationToken cancellationToken = default);
-
-        HttpStatusCode GetStatusCode(HealthStatus healthstatus);
     }
 }

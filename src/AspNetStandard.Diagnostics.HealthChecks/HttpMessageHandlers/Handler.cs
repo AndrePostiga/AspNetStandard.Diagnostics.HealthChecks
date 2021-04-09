@@ -11,14 +11,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
     internal abstract class Handler : DelegatingHandler, IHandler
     {
-        protected JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings()
-        {
-            ContractResolver = new DefaultContractResolver() { NamingStrategy = new SnakeCaseNamingStrategy() }
-        }; // ToDo: Isso aqui não deveria ser configurável?        
-
-        protected Handler()
-        {
-        }
+        protected JsonSerializerSettings SerializerSettings;
+        
+        protected Handler(HealthCheckConfiguration hcConfig) => SerializerSettings = hcConfig.SerializerSettings;
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -28,9 +23,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             }
 
             return await HandleRequest(request, cancellationToken);
-        }
-
-        public abstract Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken);
+        }        
 
         protected HttpResponseMessage MakeResponse<T>(T objectContent, HttpStatusCode statusCode)
         {
@@ -41,5 +34,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
             return response;
         }
+
+        public abstract Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken);
     }
 }

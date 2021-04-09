@@ -11,7 +11,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
         private IHandler _nextHandler;
         private readonly IAuthenticationService _authService;
 
-        public AuthenticationHandler(IAuthenticationService service)
+        public AuthenticationHandler(HealthCheckConfiguration healthCheckConfiguration, IAuthenticationService service) : base(healthCheckConfiguration)
         {
             _authService = service;
         }
