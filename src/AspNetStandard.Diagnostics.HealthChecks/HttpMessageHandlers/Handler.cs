@@ -22,7 +22,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // only accepting GET
             if (request.Method != HttpMethod.Get)
             {
                 throw new HttpRequestException("The method accepts only GET requests.");

@@ -51,7 +51,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
             return healthCheckResponse;
         }
 
-        public async Task<HealthCheckResultExtended> GetHealthAsync(string healthCheckName)
+        public async Task<HealthCheckResultExtended> GetHealthAsync(string healthCheckName, CancellationToken cancellationToken = default)
         {
             if (!_healthChecksBuilder.HealthChecks.TryGetValue(healthCheckName, out var healthCheck))
             {
@@ -63,10 +63,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 var sw = new Stopwatch();
                 sw.Reset();
                 sw.Start();
-                var result = await healthCheck.CheckHealthAsync();
-
+                var result = await healthCheck.CheckHealthAsync(cancellationToken);
                 sw.Stop();
-
                 return new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds };
             }
             catch
