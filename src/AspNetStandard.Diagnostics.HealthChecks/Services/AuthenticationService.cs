@@ -23,12 +23,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
 
         public bool NeedAuthentication()
         {
-            if (String.IsNullOrWhiteSpace(ApiKey))
-            {
-                return false;
-            }
-
-            return true;
+            return !string.IsNullOrWhiteSpace(ApiKey);
         }
     }
 }
