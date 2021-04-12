@@ -22,18 +22,18 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
         private Mock<IHealthCheck> _healthyHealthCheckMock = new Mock<IHealthCheck>();
         private HealthCheckResult _healthyHealthCheckResult = new HealthCheckResult(HealthStatus.Healthy, "AnyDescription", null);
         private HealthCheckResultExtended _healthyHealthCheckResultExtended;
-        private HealthCheckConfiguration _hcConfiguration;
+        private IHealthCheckConfiguration _hcConfiguration;
 
         public HealthCheckHandlerTests()
         {
 
             _healthyHealthCheckResultExtended = new HealthCheckResultExtended(_healthyHealthCheckResult) { ResponseTime = null, LastExecution = DateTime.MinValue }; ;
             _healthyHealthCheckMock.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(_healthyHealthCheckResult));
-            
-            _hcConfiguration = new HealthChecksBuilder().Build();
+
+            _hcConfiguration = new HealthChecksBuilder().HealthCheckConfig;
 
             var hcResponse = new HealthCheckResponse();            
-            hcResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(
+            hcResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(
                 Task.Run(() => _healthyHealthCheckMock.Object.CheckHealthAsync()).Result    
             ));            
 

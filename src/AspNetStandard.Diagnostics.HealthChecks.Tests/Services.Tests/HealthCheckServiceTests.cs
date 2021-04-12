@@ -34,7 +34,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
         public void ShouldGetStandardStatusCode()
         {
 
-            var sut = _healthCheckBuilder.Build();
+            var sut = _healthCheckBuilder.HealthCheckConfig;
 
             var ActDegradedStatusCode = sut.GetStatusCode(HealthStatus.Degraded);
             var ActHealthyStatusCode = sut.GetStatusCode(HealthStatus.Healthy);
@@ -53,7 +53,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
                                 System.Net.HttpStatusCode.NotFound,
                                 System.Net.HttpStatusCode.InternalServerError,
                                 System.Net.HttpStatusCode.Created)
-                            .Build();
+                            .HealthCheckConfig;
 
             var ActDegradedStatusCode = sut.GetStatusCode(HealthStatus.Degraded);
             var ActHealthyStatusCode = sut.GetStatusCode(HealthStatus.Healthy);
@@ -67,17 +67,20 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
         [Fact(DisplayName = "Should return correct healthCheckResponse properties")]
         public async Task ShouldGetHealthCheckAsync()
         {
-            var hcDependencies = _healthCheckBuilder.AddCheck("AnyImplementation", _healthyHealthCheckMock.Object).Build().HealthChecksDependencies;
+            var hcDependencies = _healthCheckBuilder
+                .AddCheck("AnyImplementation", _healthyHealthCheckMock.Object)
+                .HealthCheckConfig
+                .HealthChecksDependencies;
 
             var sut = new HealthCheckService(_DependencyResolverMock.Object, hcDependencies);
 
             var ActResponse = await sut.GetHealthAsync();
 
             var ExpectedResponse = new HealthCheckResponse();
-            ExpectedResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(await _healthyHealthCheckMock.Object.CheckHealthAsync()));
+            ExpectedResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(await _healthyHealthCheckMock.Object.CheckHealthAsync()));
             
             Assert.Equal(ExpectedResponse.OverAllStatus, ActResponse.OverAllStatus);
-            Assert.Equal(ExpectedResponse.Entries, ActResponse.Entries);            
+            Assert.Equal(ExpectedResponse.HealthChecks, ActResponse.HealthChecks);            
         }
 
         
@@ -87,7 +90,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 
             var hcDependencies = _healthCheckBuilder
                 .AddCheck("AnyImplementation", _healthyHealthCheckMock.Object)
-                .Build()
+                .HealthCheckConfig
                 .HealthChecksDependencies;
 
             var sut = new HealthCheckService(_DependencyResolverMock.Object, hcDependencies);
@@ -109,7 +112,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 
             var hcDependencies = _healthCheckBuilder
                 .AddCheck("AnyImplementation", _ThrowableHealthCheckMock.Object)
-                .Build()
+                .HealthCheckConfig
                 .HealthChecksDependencies;
 
             var sut = new HealthCheckService(_DependencyResolverMock.Object, hcDependencies);
@@ -117,10 +120,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             var ActResponse = await sut.GetHealthAsync();
 
             var ExpectedResponse = new HealthCheckResponse();
-            ExpectedResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
+            ExpectedResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
 
             Assert.Equal(HealthStatus.Unhealthy, ActResponse.OverAllStatus);
-            Assert.Equal(ExpectedResponse.Entries, ActResponse.Entries);
+            Assert.Equal(ExpectedResponse.HealthChecks, ActResponse.HealthChecks);
         }
 
 
@@ -130,7 +133,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             var hcDependencies = _healthCheckBuilder
                 .AddCheck("AnyImplementation", _degradedHealthCheckMock.Object)
                 .AddCheck("AnotherImplementation", _healthyHealthCheckMock.Object)
-                .Build()
+                .HealthCheckConfig
                 .HealthChecksDependencies;
 
             var sut = new HealthCheckService(_DependencyResolverMock.Object, hcDependencies);
@@ -138,11 +141,11 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             var ActResponse = await sut.GetHealthAsync();
 
             var ExpectedResponse = new HealthCheckResponse();
-            ExpectedResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(await _degradedHealthCheckMock.Object.CheckHealthAsync()));
-            ExpectedResponse.Entries.Add("AnotherImplementation", new HealthCheckResultExtended(await _healthyHealthCheckMock.Object.CheckHealthAsync()));
+            ExpectedResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(await _degradedHealthCheckMock.Object.CheckHealthAsync()));
+            ExpectedResponse.HealthChecks.Add("AnotherImplementation", new HealthCheckResultExtended(await _healthyHealthCheckMock.Object.CheckHealthAsync()));
 
             Assert.Equal(HealthStatus.Degraded, ActResponse.OverAllStatus);
-            Assert.Equal(ExpectedResponse.Entries, ActResponse.Entries);
+            Assert.Equal(ExpectedResponse.HealthChecks, ActResponse.HealthChecks);
         }
 
         [Fact(DisplayName = "Should return unhealthy status if at least one check is unhealthy")]
@@ -151,7 +154,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             var hcDependencies = _healthCheckBuilder
                 .AddCheck("AnyImplementation", _degradedHealthCheckMock.Object)
                 .AddCheck("AnotherImplementation", _unhealthyHealthCheckMock.Object)
-                .Build()
+                .HealthCheckConfig
                 .HealthChecksDependencies;
 
             var sut = new HealthCheckService(_DependencyResolverMock.Object, hcDependencies);
@@ -159,11 +162,11 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             var ActResponse = await sut.GetHealthAsync();
 
             var ExpectedResponse = new HealthCheckResponse();
-            ExpectedResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(await _degradedHealthCheckMock.Object.CheckHealthAsync()));
-            ExpectedResponse.Entries.Add("AnotherImplementation", new HealthCheckResultExtended(await _unhealthyHealthCheckMock.Object.CheckHealthAsync()));
+            ExpectedResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(await _degradedHealthCheckMock.Object.CheckHealthAsync()));
+            ExpectedResponse.HealthChecks.Add("AnotherImplementation", new HealthCheckResultExtended(await _unhealthyHealthCheckMock.Object.CheckHealthAsync()));
 
             Assert.Equal(HealthStatus.Unhealthy, ActResponse.OverAllStatus);
-            Assert.Equal(ExpectedResponse.Entries, ActResponse.Entries);
+            Assert.Equal(ExpectedResponse.HealthChecks, ActResponse.HealthChecks);
         }
 
 
@@ -173,7 +176,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             var hcDependencies = _healthCheckBuilder
                 .AddCheck("AnyImplementation", _degradedHealthCheckMock.Object)
                 .AddCheck("AnotherImplementation", _unhealthyHealthCheckMock.Object)
-                .Build()
+                .HealthCheckConfig
                 .HealthChecksDependencies;
 
             var sut = new HealthCheckService(_DependencyResolverMock.Object, hcDependencies);
@@ -191,7 +194,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             var hcDependencies = _healthCheckBuilder
                 .AddCheck("AnyImplementation", _degradedHealthCheckMock.Object)
                 .AddCheck("AnotherImplementation", _ThrowableHealthCheckMock.Object)
-                .Build()
+                .HealthCheckConfig
                 .HealthChecksDependencies;
 
             var sut = new HealthCheckService(_DependencyResolverMock.Object, hcDependencies);
@@ -210,7 +213,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             var hcDependencies = _healthCheckBuilder
                 .AddCheck("AnyImplementation", _degradedHealthCheckMock.Object)
                 .AddCheck("AnotherImplementation", _ThrowableHealthCheckMock.Object)
-                .Build()
+                .HealthCheckConfig
                 .HealthChecksDependencies;
 
             var sut = new HealthCheckService(_DependencyResolverMock.Object, hcDependencies);

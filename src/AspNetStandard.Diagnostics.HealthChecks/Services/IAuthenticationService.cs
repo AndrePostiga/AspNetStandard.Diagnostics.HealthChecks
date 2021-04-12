@@ -9,6 +9,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
     {
         bool NeedAuthentication();
 
-        bool ValidateApiKey(HttpRequestMessage request);
+        bool ValidateApiKey(string apiKeyRequest);
     }
 }

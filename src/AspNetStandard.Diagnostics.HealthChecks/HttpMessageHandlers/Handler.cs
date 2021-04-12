@@ -11,9 +11,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
     internal abstract class Handler : DelegatingHandler, IHandler
     {
-        protected JsonSerializerSettings SerializerSettings;
-        
-        protected Handler(HealthCheckConfiguration hcConfig) => SerializerSettings = hcConfig.SerializerSettings;
+        private IHealthCheckConfiguration _hcConfig;
+
+        protected Handler(IHealthCheckConfiguration hcConfig) => _hcConfig = hcConfig;
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
@@ -29,7 +29,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
         {
             var response = new HttpResponseMessage(statusCode)
             {
-                Content = new ObjectContent<T>(objectContent, new JsonMediaTypeFormatter { SerializerSettings = SerializerSettings })
+                Content = new ObjectContent<T>(objectContent, new JsonMediaTypeFormatter { SerializerSettings = _hcConfig.SerializerSettings})
             };
 
             return response;

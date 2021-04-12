@@ -20,7 +20,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is HealthCheckResult))
+            if (!(obj is HealthCheckResult))
             {
                 return false;
             }

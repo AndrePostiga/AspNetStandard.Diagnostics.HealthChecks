@@ -23,8 +23,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
         public void ShouldReturnDegraded()
         {
             var sut = new HealthCheckResponse();
-            sut.Entries.Add("AnyName", HealthyResult);
-            sut.Entries.Add("AnyAnotherName", DegradedResult);
+            sut.HealthChecks.Add("AnyName", HealthyResult);
+            sut.HealthChecks.Add("AnyAnotherName", DegradedResult);
 
             Assert.Equal(HealthStatus.Degraded, sut.OverAllStatus);
 
@@ -34,9 +34,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
         public void ShouldReturnUnhealthy()
         {
             var sut = new HealthCheckResponse();
-            sut.Entries.Add("AnyName", HealthyResult);
-            sut.Entries.Add("AnyAnotherName", DegradedResult);
-            sut.Entries.Add("UnhealthyAnotherName", UnhealthyResult);
+            sut.HealthChecks.Add("AnyName", HealthyResult);
+            sut.HealthChecks.Add("AnyAnotherName", DegradedResult);
+            sut.HealthChecks.Add("UnhealthyAnotherName", UnhealthyResult);
 
             Assert.Equal(HealthStatus.Unhealthy, sut.OverAllStatus);
 
@@ -46,9 +46,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
         public void ShouldReturnHealthy()
         {
             var sut = new HealthCheckResponse();
-            sut.Entries.Add("AnyName", HealthyResult);
-            sut.Entries.Add("AnyAnotherName", HealthyResult);
-            sut.Entries.Add("UnhealthyAnotherName", HealthyResult);
+            sut.HealthChecks.Add("AnyName", HealthyResult);
+            sut.HealthChecks.Add("AnyAnotherName", HealthyResult);
+            sut.HealthChecks.Add("UnhealthyAnotherName", HealthyResult);
 
             Assert.Equal(HealthStatus.Healthy, sut.OverAllStatus);
 
@@ -58,9 +58,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
         public void ShouldSumCorrectly()
         {
             var sut = new HealthCheckResponse();
-            sut.Entries.Add("AnyName", HealthyResult);
-            sut.Entries.Add("AnyAnotherName", DegradedResult);
-            sut.Entries.Add("UnhealthyAnotherName", UnhealthyResult);
+            sut.HealthChecks.Add("AnyName", HealthyResult);
+            sut.HealthChecks.Add("AnyAnotherName", DegradedResult);
+            sut.HealthChecks.Add("UnhealthyAnotherName", UnhealthyResult);
 
             Assert.Equal(3, sut.TotalResponseTime);
         }

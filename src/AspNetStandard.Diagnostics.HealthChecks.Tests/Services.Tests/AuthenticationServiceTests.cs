@@ -11,30 +11,27 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 {
     public class AuthenticationServiceTests
     {
-        HttpRequestMessage _httpMessage;
-        string _apiKey;
+        private IHealthCheckConfiguration _hcConfig;
+
         public AuthenticationServiceTests()
         {
-            _httpMessage = new HttpRequestMessage()
-            {
-                RequestUri = new Uri("http://anyDomain/health?ApiKey=AnyApiKey")
-            };
-
-            _apiKey = "AnyApiKey";
+            _hcConfig = new HealthChecksBuilder()
+                .UseAuthorization("AnyApiKey")
+                .HealthCheckConfig;
         }
 
         [Fact(DisplayName ="Should return true when apiKey is correctly")]
         public void ShoudlReturnTrueOnValidation()
         {
-            var sut = new AuthenticationService(_apiKey);
-            var act = sut.ValidateApiKey(_httpMessage);
+            var sut = new AuthenticationService(_hcConfig);
+            var act = sut.ValidateApiKey("AnyApiKey");
             Assert.True(act == true);
         }
 
         [Fact(DisplayName = "Should validate if authorization is needed")]
         public void ShoudlReturnTrueIfNeedValidation()
         {;
-            var sut = new AuthenticationService(_apiKey);
+            var sut = new AuthenticationService(_hcConfig);
             var act = sut.NeedAuthentication();
             Assert.True(act == true);
         }
@@ -42,7 +39,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
         [Fact(DisplayName = "Should validate if authorization is not needed")]
         public void ShoudlReturnTrueIfNoNeedValidation()
         {
-            var sut = new AuthenticationService(null);
+            var customConfig = new HealthChecksBuilder()
+                .HealthCheckConfig;
+
+            var sut = new AuthenticationService(customConfig);
             var act = sut.NeedAuthentication();
             Assert.True(act == false);
         }
