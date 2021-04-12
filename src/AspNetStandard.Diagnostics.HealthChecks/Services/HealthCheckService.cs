@@ -39,7 +39,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                     var result = await task.Value.CheckHealthAsync(cancellationToken);
                     sw.Stop();
 
-                    healthCheckResponse.Entries.Add(task.Key, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
+                    healthCheckResponse.HealthChecks.Add(task.Key, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
                 }
                 catch (OperationCanceledException)
                 {
@@ -47,7 +47,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 }
                 catch
                 {
-                    healthCheckResponse.Entries.Add(task.Key, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
+                    healthCheckResponse.HealthChecks.Add(task.Key, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
                 }
             }
 

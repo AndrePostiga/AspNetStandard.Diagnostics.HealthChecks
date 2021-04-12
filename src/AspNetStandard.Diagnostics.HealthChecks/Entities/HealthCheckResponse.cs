@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Entities
@@ -7,21 +8,21 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
     {
         public HealthCheckResponse()
         {
-            Entries = new Dictionary<string, HealthCheckResultExtended>();
+            HealthChecks = new Dictionary<string, HealthCheckResultExtended>();
         }
-
-        public IDictionary<string, HealthCheckResultExtended> Entries { get; }
+        
+        public IDictionary<string, HealthCheckResultExtended> HealthChecks { get; }
 
         public HealthStatus OverAllStatus
         {
             get
             {
-                if (Entries.Values.Any(x => x.Status == HealthStatus.Unhealthy))
+                if (HealthChecks.Values.Any(x => x.Status == HealthStatus.Unhealthy))
                 {
                     return HealthStatus.Unhealthy;
                 }
                 
-                if (Entries.Values.Any(x => x.Status == HealthStatus.Degraded))
+                if (HealthChecks.Values.Any(x => x.Status == HealthStatus.Degraded))
                 {
                     return HealthStatus.Degraded;
                 }
@@ -34,7 +35,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         {
             get
             {
-                return Entries.Values.Sum(c => c.ResponseTime);
+                return HealthChecks.Values.Sum(c => c.ResponseTime);
             }
         }
     }
