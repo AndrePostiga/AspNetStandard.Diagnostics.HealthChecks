@@ -20,7 +20,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             var authenticationHandler = new AuthenticationHandler(hcConfig, authenticationService);
             var healthCheckHandler = new HealthCheckHandler(hcConfig, healthChecksService);
 
-            // ChainOfResponsability
+            // ChainOfResponsibility
             authenticationHandler.SetNextHandler(healthCheckHandler);
 
             httpConfiguration.Routes.MapHttpRoute(
