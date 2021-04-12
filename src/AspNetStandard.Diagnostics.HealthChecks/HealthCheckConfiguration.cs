@@ -7,19 +7,19 @@ using System.Net;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {
-    public class HealthCheckConfiguration
+    public class HealthCheckConfiguration : IHealthCheckConfiguration
     {
-        internal IDictionary<HealthStatus, HttpStatusCode> ResultStatusCodes { get; } = new Dictionary<HealthStatus, HttpStatusCode>(3)
+        public IDictionary<HealthStatus, HttpStatusCode> ResultStatusCodes { get; } = new Dictionary<HealthStatus, HttpStatusCode>(3)
         {
             {HealthStatus.Healthy, HttpStatusCode.OK},
             {HealthStatus.Degraded, HttpStatusCode.OK},
             {HealthStatus.Unhealthy, HttpStatusCode.ServiceUnavailable}
         };
 
-        internal IDictionary<string, Registration> HealthChecksDependencies { get; } = new Dictionary<string, Registration>(StringComparer.OrdinalIgnoreCase);
+        public IDictionary<string, Registration> HealthChecksDependencies { get; } = new Dictionary<string, Registration>(StringComparer.OrdinalIgnoreCase);
 
         private string _apiKey;
-        internal string ApiKey
+        public string ApiKey
         {
             get => _apiKey;
             set => _apiKey = value;
@@ -31,7 +31,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             ContractResolver = new DefaultContractResolver() { NamingStrategy = new SnakeCaseNamingStrategy() }
         };
 
-        internal JsonSerializerSettings SerializerSettings
+        public JsonSerializerSettings SerializerSettings
         {
             get => _serializerSettings;
             set

@@ -3,7 +3,7 @@ using System;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {
-    internal class Registration // ToDo: É legal pensar em alguma forma de executar o dispose dos checks, principalmente quando não for singleton, pois as conexões precisam ser liberadas.
+    public class Registration // ToDo: É legal pensar em alguma forma de executar o dispose dos checks, principalmente quando não for singleton, pois as conexões precisam ser liberadas.
     {
         public Registration(IHealthCheck instance)
         {

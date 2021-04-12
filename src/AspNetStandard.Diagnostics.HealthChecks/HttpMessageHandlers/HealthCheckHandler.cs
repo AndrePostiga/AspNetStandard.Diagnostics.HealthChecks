@@ -12,10 +12,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
     internal class HealthCheckHandler : Handler
     {
         private readonly IHealthCheckService _hcService;
-        private readonly HealthCheckConfiguration _hcConfig;
+        private readonly IHealthCheckConfiguration _hcConfig;
 
-        public HealthCheckHandler(HealthCheckConfiguration healthCheckConfiguration, IHealthCheckService healthCheckService) 
-            : base(healthCheckConfiguration)
+        public HealthCheckHandler(IHealthCheckConfiguration healthCheckConfiguration, IHealthCheckService healthCheckService) : base(healthCheckConfiguration)
         {
             _hcService = healthCheckService;
             _hcConfig = healthCheckConfiguration;

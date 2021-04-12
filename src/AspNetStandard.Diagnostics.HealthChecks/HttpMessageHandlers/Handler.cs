@@ -13,7 +13,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
     {
         protected JsonSerializerSettings SerializerSettings;
         
-        protected Handler(HealthCheckConfiguration hcConfig) => SerializerSettings = hcConfig.SerializerSettings;
+        protected Handler(IHealthCheckConfiguration hcConfig) => SerializerSettings = hcConfig.SerializerSettings;
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
