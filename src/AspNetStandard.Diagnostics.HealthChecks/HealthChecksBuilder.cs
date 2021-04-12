@@ -1,5 +1,6 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -8,7 +9,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 {
     public sealed class HealthChecksBuilder
     {
-        public HealthCheckConfiguration HealthCheckConfig { get; } = new HealthCheckConfiguration();
+        internal HealthCheckConfiguration HealthCheckConfig { get; } = new HealthCheckConfiguration();
 
         public HealthChecksBuilder AddCheck(string name, IHealthCheck healthCheck)
         {

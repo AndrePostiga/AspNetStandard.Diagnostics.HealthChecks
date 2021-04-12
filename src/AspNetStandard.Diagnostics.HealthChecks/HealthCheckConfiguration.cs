@@ -7,7 +7,7 @@ using System.Net;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {
-    public class HealthCheckConfiguration : IHealthCheckConfiguration
+    internal class HealthCheckConfiguration : IHealthCheckConfiguration
     {
         public IDictionary<HealthStatus, HttpStatusCode> ResultStatusCodes { get; } = new Dictionary<HealthStatus, HttpStatusCode>(3)
         {
@@ -28,7 +28,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 
         private JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
         {
-            ContractResolver = new DefaultContractResolver() { NamingStrategy = new SnakeCaseNamingStrategy() }
+            ContractResolver = new DefaultContractResolver()
+            {
+                NamingStrategy = new SnakeCaseNamingStrategy()
+                {
+                    ProcessDictionaryKeys = true
+                }
+            }            
         };
 
         public JsonSerializerSettings SerializerSettings
@@ -36,7 +42,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             get => _serializerSettings;
             set
             {
-                if (value == null) return;
+                if (value == null) return;                
                 _serializerSettings = value;
             }
         }

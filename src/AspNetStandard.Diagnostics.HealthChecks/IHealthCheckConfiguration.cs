@@ -7,7 +7,7 @@ using System.Text;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {
-    public interface IHealthCheckConfiguration
+    internal interface IHealthCheckConfiguration
     {
         IDictionary<HealthStatus, HttpStatusCode> ResultStatusCodes { get; }
         IDictionary<string, Registration> HealthChecksDependencies { get; }
