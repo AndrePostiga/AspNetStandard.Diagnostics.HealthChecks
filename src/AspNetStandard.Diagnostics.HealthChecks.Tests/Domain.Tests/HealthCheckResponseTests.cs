@@ -1,30 +1,27 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
 {
     public class HealthCheckResponseTests
     {
-        HealthCheckResultExtended HealthyResult;
-        HealthCheckResultExtended DegradedResult;
-        HealthCheckResultExtended UnhealthyResult;
+        private readonly HealthCheckResultExtended _healthyResult;
+        private readonly HealthCheckResultExtended _degradedResult;
+        private readonly HealthCheckResultExtended _unhealthyResult;
 
         public HealthCheckResponseTests()
         {
-            HealthyResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Healthy)) { ResponseTime = 1};
-            DegradedResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Degraded)) { ResponseTime = 1 };
-            UnhealthyResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)) { ResponseTime = 1 };
+            _healthyResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Healthy)) { ResponseTime = 1};
+            _degradedResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Degraded)) { ResponseTime = 1 };
+            _unhealthyResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)) { ResponseTime = 1 };
         }
 
         [Fact(DisplayName = "Should return degraded if at least one status is degraded")]
         public void ShouldReturnDegraded()
         {
             var sut = new HealthCheckResponse();
-            sut.HealthChecks.Add("AnyName", HealthyResult);
-            sut.HealthChecks.Add("AnyAnotherName", DegradedResult);
+            sut.HealthChecks.Add("AnyName", _healthyResult);
+            sut.HealthChecks.Add("AnyAnotherName", _degradedResult);
 
             Assert.Equal(HealthStatus.Degraded, sut.OverAllStatus);
 
@@ -34,9 +31,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
         public void ShouldReturnUnhealthy()
         {
             var sut = new HealthCheckResponse();
-            sut.HealthChecks.Add("AnyName", HealthyResult);
-            sut.HealthChecks.Add("AnyAnotherName", DegradedResult);
-            sut.HealthChecks.Add("UnhealthyAnotherName", UnhealthyResult);
+            sut.HealthChecks.Add("AnyName", _healthyResult);
+            sut.HealthChecks.Add("AnyAnotherName", _degradedResult);
+            sut.HealthChecks.Add("UnhealthyAnotherName", _unhealthyResult);
 
             Assert.Equal(HealthStatus.Unhealthy, sut.OverAllStatus);
 
@@ -46,9 +43,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
         public void ShouldReturnHealthy()
         {
             var sut = new HealthCheckResponse();
-            sut.HealthChecks.Add("AnyName", HealthyResult);
-            sut.HealthChecks.Add("AnyAnotherName", HealthyResult);
-            sut.HealthChecks.Add("UnhealthyAnotherName", HealthyResult);
+            sut.HealthChecks.Add("AnyName", _healthyResult);
+            sut.HealthChecks.Add("AnyAnotherName", _healthyResult);
+            sut.HealthChecks.Add("UnhealthyAnotherName", _healthyResult);
 
             Assert.Equal(HealthStatus.Healthy, sut.OverAllStatus);
 
@@ -58,9 +55,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
         public void ShouldSumCorrectly()
         {
             var sut = new HealthCheckResponse();
-            sut.HealthChecks.Add("AnyName", HealthyResult);
-            sut.HealthChecks.Add("AnyAnotherName", DegradedResult);
-            sut.HealthChecks.Add("UnhealthyAnotherName", UnhealthyResult);
+            sut.HealthChecks.Add("AnyName", _healthyResult);
+            sut.HealthChecks.Add("AnyAnotherName", _degradedResult);
+            sut.HealthChecks.Add("UnhealthyAnotherName", _unhealthyResult);
 
             Assert.Equal(3, sut.TotalResponseTime);
         }
