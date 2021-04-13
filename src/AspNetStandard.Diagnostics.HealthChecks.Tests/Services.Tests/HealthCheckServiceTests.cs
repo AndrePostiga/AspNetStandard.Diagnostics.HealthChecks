@@ -27,7 +27,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             _degradedHealthCheckMock.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(new HealthCheckResult(HealthStatus.Degraded, "AnyDescription", null)));
             _unhealthyHealthCheckMock.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(new HealthCheckResult(HealthStatus.Unhealthy, "AnyDescription", null)));
             _ThrowableHealthCheckMock.Setup(x => x.CheckHealthAsync(default)).ThrowsAsync(new Exception("AnyException"));
-            //_DependencyResolverMock.Setup(x => x.GetService(It.IsAny<Type>())).Returns()
         }
          
         [Fact(DisplayName = "Should return correct status code if builder remain not modified")]
