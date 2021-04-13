@@ -1,9 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,7 +8,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 {
     internal abstract class Handler : DelegatingHandler, IHandler
     {
-        private IHealthCheckConfiguration _hcConfig;
+        private readonly IHealthCheckConfiguration _hcConfig;
 
         protected Handler(IHealthCheckConfiguration hcConfig) => _hcConfig = hcConfig;
 

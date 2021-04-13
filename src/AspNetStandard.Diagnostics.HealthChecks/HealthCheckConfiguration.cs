@@ -18,12 +18,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 
         public IDictionary<string, Registration> HealthChecksDependencies { get; } = new Dictionary<string, Registration>(StringComparer.OrdinalIgnoreCase);
 
-        private string _apiKey;
-        public string ApiKey
-        {
-            get => _apiKey;
-            set => _apiKey = value;
-        }
+        public string ApiKey { get; set; }
 
 
         private JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
