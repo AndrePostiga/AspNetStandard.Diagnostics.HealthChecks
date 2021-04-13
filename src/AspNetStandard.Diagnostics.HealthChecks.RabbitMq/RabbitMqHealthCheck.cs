@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
 {
-    public class RabbitMqHealthCheck : IHealthCheck, IDisposable // ToDo: Caso não seja estático, a conexão deve ser encerrada por conta de leak
+    public class RabbitMqHealthCheck : IHealthCheck, IDisposable 
     {
-        private bool _disposed; // ToDo: Implementei a interface IDisposable
-        private static volatile object _sync = new object(); // ToDo: Fiz uma implementação de multithread
-        private IConnection _connection; // ToDo: Deveria ser estático? Um pool?
+        private bool _disposed;
+        private static volatile object _sync = new object();
+        private IConnection _connection;
         private readonly IConnectionFactory _factory;
 
         public RabbitMqHealthCheck(IConnection connection)
