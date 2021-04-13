@@ -19,10 +19,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Redis
 
         public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
-            ConnectionMultiplexer connection = null;
             try
             {
-                if (!_connections.TryGetValue(_redisConnectionString, out connection))
+                if (!_connections.TryGetValue(_redisConnectionString, out ConnectionMultiplexer connection))
                 {
                     connection = await ConnectionMultiplexer.ConnectAsync(_redisConnectionString);
 
@@ -34,19 +33,37 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Redis
 
                 }
 
-                await connection?.GetDatabase().PingAsync();
-                var result = new HealthCheckResult(HealthStatus.Healthy, "Redis is healthy");
+                foreach (var endPoint in connection.GetEndPoints(configuredOnly: true))
+                {
+                    var server = connection.GetServer(endPoint);
 
-                connection?.Dispose();
-                return result;
+                    if (server.ServerType != ServerType.Cluster)
+                    {
+                        await connection.GetDatabase().PingAsync();
+                        await server.PingAsync();
+                    }
+                    else
+                    {
+                        var clusterInfo = await server.ExecuteAsync("CLUSTER", "INFO");
+                        if (clusterInfo is object && !clusterInfo.IsNull)
+                        {
+                            if (!clusterInfo.ToString().Contains("cluster_state:ok"))
+                            {
+                                return new HealthCheckResult(HealthStatus.Unhealthy, description: $"INFO CLUSTER is not on OK state for endpoint {endPoint}");
+                            }
+                        }
+                        else
+                        {
+                            return new HealthCheckResult(HealthStatus.Unhealthy, description: $"INFO CLUSTER is null or can't be read for endpoint {endPoint}");                            
+                        }
+                    }
+                }
+
+                return new HealthCheckResult(HealthStatus.Healthy, "Redis is healthy");
             }
             catch (Exception ex)
             {
                 return new HealthCheckResult(HealthStatus.Unhealthy, "Redis is unhealthy", exception: ex);
-            }
-            finally
-            {
-                connection?.Dispose();
             }
         }
     }
