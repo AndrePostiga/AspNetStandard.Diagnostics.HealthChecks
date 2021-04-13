@@ -1,8 +1,6 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Net;
 
 namespace AspNetStandard.Diagnostics.HealthChecks

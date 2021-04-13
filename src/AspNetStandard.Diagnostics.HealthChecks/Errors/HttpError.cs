@@ -12,7 +12,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Errors
         {
             HttpErrorResponse = new
             {
-                statusCode = statusCode,
+                statusCode,
                 message = errorMessage
             };
 

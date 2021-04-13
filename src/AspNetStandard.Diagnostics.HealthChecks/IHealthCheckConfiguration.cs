@@ -1,9 +1,7 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Text;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {

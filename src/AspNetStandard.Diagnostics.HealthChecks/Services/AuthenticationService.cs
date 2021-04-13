@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net.Http;
-
-namespace AspNetStandard.Diagnostics.HealthChecks.Services
+﻿namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
     internal class AuthenticationService : IAuthenticationService
     {
@@ -12,9 +9,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
             _hcConfig = hcConfig;
         }
 
-        public bool ValidateApiKey(string apiKeyrequest)
+        public bool ValidateApiKey(string apiKeyRequest)
         {
-            return apiKeyrequest == _hcConfig.ApiKey;
+            return apiKeyRequest == _hcConfig.ApiKey;
         }
 
         public bool NeedAuthentication()

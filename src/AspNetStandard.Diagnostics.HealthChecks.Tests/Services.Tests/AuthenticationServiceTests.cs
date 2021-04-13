@@ -5,7 +5,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 {
     public class AuthenticationServiceTests
     {
-        private IHealthCheckConfiguration _hcConfig;
+        private readonly IHealthCheckConfiguration _hcConfig;
 
         public AuthenticationServiceTests()
         {
@@ -19,15 +19,15 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
         {
             var sut = new AuthenticationService(_hcConfig);
             var act = sut.ValidateApiKey("AnyApiKey");
-            Assert.True(act == true);
+            Assert.True(act);
         }
 
         [Fact(DisplayName = "Should validate if authorization is needed")]
         public void ShouldReturnTrueIfNeedValidation()
-        {;
+        {
             var sut = new AuthenticationService(_hcConfig);
             var act = sut.NeedAuthentication();
-            Assert.True(act == true);
+            Assert.True(act);
         }
 
         [Fact(DisplayName = "Should validate if authorization is not needed")]
@@ -38,7 +38,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 
             var sut = new AuthenticationService(customConfig);
             var act = sut.NeedAuthentication();
-            Assert.True(act == false);
+            Assert.False(act);
         }
     }
 }
