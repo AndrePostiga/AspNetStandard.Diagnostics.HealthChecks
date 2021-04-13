@@ -57,7 +57,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
         }
 
         [Fact(DisplayName = "Should call healthCheckAsync with correct parameters")]
-        public async void ShouldCallWithCorrectParameters()
+        public async Task ShouldCallWithCorrectParameters()
         {   
             var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
             var act = await sut.HandleRequest(httpMessage, It.IsAny<CancellationToken>());
@@ -65,7 +65,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
         }
 
         [Fact(DisplayName = "Should call healthCheckAsync overload with correct parameters if query parameter is passed")]
-        public async void ShouldCallWithCorrectParametersWithQueryParameter()
+        public async Task ShouldCallWithCorrectParametersWithQueryParameter()
         {
             var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
             var act = await sut.HandleRequest(httpMessageWithParameter, It.IsAny<CancellationToken>());

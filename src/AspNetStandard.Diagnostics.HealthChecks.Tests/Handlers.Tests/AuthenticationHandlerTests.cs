@@ -48,7 +48,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
         
 
         [Fact(DisplayName = "Should call validate apikey with correct api key")]
-        public async void ShouldCallValidateWithCorrectArgument()
+        public async Task ShouldCallValidateWithCorrectArgument()
         {
             var sut = new AuthenticationHandler(_hcBuilder.HealthCheckConfig, mockAuthservice.Object);
 
@@ -63,7 +63,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
 
       
         [Fact(DisplayName = "Should call next handler with correct arguments if no authentication is needed")]
-        public async void ShouldSetNextHandlerCorrectly()
+        public async Task ShouldSetNextHandlerCorrectly()
         {
             mockAuthservice.Setup(x => x.NeedAuthentication()).Returns(false);
 
@@ -87,7 +87,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
         }
        
         [Fact(DisplayName = "Should call nextHandler with correct parameters if validade pass")]
-        public async void ShouldCallNextHandlerWithCorrectParameters()
+        public async Task ShouldCallNextHandlerWithCorrectParameters()
         {           
             var httpRequestWithCorrectApiKey = new HttpRequestMessage(HttpMethod.Get, "http://anyurl.com/?apikey=AnyApiKey");            
 

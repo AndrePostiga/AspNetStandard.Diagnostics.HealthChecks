@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Services;
 using Xunit;
-using Moq;
-using System.Net.Http;
-using System.Collections.Specialized;
-using AspNetStandard.Diagnostics.HealthChecks.Services;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 {
@@ -21,7 +15,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
         }
 
         [Fact(DisplayName ="Should return true when apiKey is correctly")]
-        public void ShoudlReturnTrueOnValidation()
+        public void ShouldReturnTrueOnValidation()
         {
             var sut = new AuthenticationService(_hcConfig);
             var act = sut.ValidateApiKey("AnyApiKey");
@@ -29,7 +23,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
         }
 
         [Fact(DisplayName = "Should validate if authorization is needed")]
-        public void ShoudlReturnTrueIfNeedValidation()
+        public void ShouldReturnTrueIfNeedValidation()
         {;
             var sut = new AuthenticationService(_hcConfig);
             var act = sut.NeedAuthentication();
@@ -37,7 +31,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
         }
 
         [Fact(DisplayName = "Should validate if authorization is not needed")]
-        public void ShoudlReturnTrueIfNoNeedValidation()
+        public void ShouldReturnTrueIfNoNeedValidation()
         {
             var customConfig = new HealthChecksBuilder()
                 .HealthCheckConfig;
