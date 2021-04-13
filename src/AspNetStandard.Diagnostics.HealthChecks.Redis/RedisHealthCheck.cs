@@ -19,26 +19,34 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Redis
 
         public async Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
+            ConnectionMultiplexer connection = null;
             try
             {
-                if (!_connections.TryGetValue(_redisConnectionString, out ConnectionMultiplexer connection))
+                if (!_connections.TryGetValue(_redisConnectionString, out connection))
                 {
                     connection = await ConnectionMultiplexer.ConnectAsync(_redisConnectionString);
 
                     if (!_connections.TryAdd(_redisConnectionString, connection))
                     {
                         connection.Dispose();
-                        connection = _connections[_redisConnectionString]; // ToDo: Isso vai gerar uma exceção em 100% das vezes.
+                        connection = _connections[_redisConnectionString]; 
                     }
+
                 }
 
-                await connection.GetDatabase().PingAsync();
+                await connection?.GetDatabase().PingAsync();
+                var result = new HealthCheckResult(HealthStatus.Healthy, "Redis is healthy");
 
-                return new HealthCheckResult(HealthStatus.Healthy, "Redis is healthy");
+                connection?.Dispose();
+                return result;
             }
             catch (Exception ex)
             {
                 return new HealthCheckResult(HealthStatus.Unhealthy, "Redis is unhealthy", exception: ex);
+            }
+            finally
+            {
+                connection?.Dispose();
             }
         }
     }
