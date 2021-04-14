@@ -1,13 +1,48 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-	<PackageLicenseExpression>MIT</PackageLicenseExpression>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Authors>Andre Postiga</Authors>
+		<Company>Andre Postiga</Company>
+		<Version>1.0.1</Version>
+		<PackageProjectUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</RepositoryUrl>
+		<Description>Project based on Kirill's and Kpol's project. Original project avaiable on GitHub Link: (https://github.com/kpol/WebApi.HealthChecks) and my new version: (https://github.com/AndrePostiga/WebApi.HealthChecks)</Description>
+		<RepositoryType>Git</RepositoryType>
+		<PackageTags>web, web-api, health, health-check, aspnet-standard</PackageTags>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<Title>AspNetStandard.Diagnostics.HealthChecks.MongoDb</Title>
+		<Description>WebApi extension of the health check for mongodb health reporting.</Description>
+		<FileVersion>1.0.0.0</FileVersion>
+		<AssemblyName>AspNetStandard.Diagnostics.HealthChecks.MongoDb</AssemblyName>
+		<RootNamespace>AspNetStandard.Diagnostics.HealthChecks.MongoDb</RootNamespace>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReleaseNotes>
+			Release Notes v1.0.1:
 
-  <ItemGroup>
-    <PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.0.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.11.5" />
-  </ItemGroup>
+			🐛 Implementing IDisposable on RabbitMQ extension to not keep connections after check
+			🐛 Implementing thread safe check on RabbitMQ extension
+			🐛 Implementing cluster check on Redis extension to teste clustered redis
+			🐛 CancellationToken now is passed to GetHealthAsync on unique service checks
+			🎨 Refactor code typos, iterations to lambdas, spells, modifiers, broken tests, code smells
+			🎨 Refactor handlers to decrease code lines and refactor dependency resolver to application services
+			🎨 Refactor builter to generate an healthCheck configuration class and passes it to handlers and services
+			🎨 Refactor AuthenticationHandler to read query parameters instead of AuthenticationService
+			✨ Add the possibility to configure JsonSerializerSettings
+			❌ Deletion of dependency handler and dependency handler tests
+
+			Legend:
+			🐛 Bug
+			🎨 Refactor
+			✨ Feature
+		</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.0.0" />
+		<PackageReference Include="MongoDB.Driver" Version="2.11.5" />
+	</ItemGroup>
 
 </Project>
