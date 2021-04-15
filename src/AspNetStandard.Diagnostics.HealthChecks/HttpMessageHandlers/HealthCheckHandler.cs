@@ -1,6 +1,9 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using AspNetStandard.Diagnostics.HealthChecks.Errors;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
+using Serilog;
+using Serilog.Context;
+using Serilog.Events;
 using System;
 using System.Linq;
 using System.Net.Http;
@@ -13,11 +16,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
     {
         private readonly IHealthCheckService _hcService;
         private readonly IHealthCheckConfiguration _hcConfig;
+        private readonly ILogger _logger;
 
-        public HealthCheckHandler(IHealthCheckConfiguration healthCheckConfiguration, IHealthCheckService healthCheckService) : base(healthCheckConfiguration)
+        public HealthCheckHandler(IHealthCheckConfiguration healthCheckConfiguration, IHealthCheckService healthCheckService, ILogger logger) : base(healthCheckConfiguration)
         {
             _hcService = healthCheckService;
             _hcConfig = healthCheckConfiguration;
+            _logger = logger;
         }
 
         public async override Task<HttpResponseMessage> HandleRequest(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -33,10 +38,18 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                 }
 
                 var result = await _hcService.GetHealthAsync(cancellationToken);
+                LogContext.PushProperty("Content", result, true);
+                LogContext.PushProperty("TotalResponseTime", result, true);
+
+                var messageTemplate = "[{Application}: HealthCheck] " + _hcConfig.GetStatusCode(result.OverAllStatus) + LogEventLevel.Information;
+                if(_logger != null)
+                    _logger.Write(LogEventLevel.Information, messageTemplate, DateTime.UtcNow);
                 return MakeResponse<HealthCheckResponse>(result, _hcConfig.GetStatusCode(result.OverAllStatus));
             }
             catch (NotFoundError error)
             {
+                var messageTemplate = "[{Application}: HealthCheck] " + LogEventLevel.Error;
+                _logger?.Error(error, messageTemplate, DateTime.UtcNow);
                 return MakeResponse(error.HttpErrorResponse, error.HttpErrorStatusCode);
             }            
         }
