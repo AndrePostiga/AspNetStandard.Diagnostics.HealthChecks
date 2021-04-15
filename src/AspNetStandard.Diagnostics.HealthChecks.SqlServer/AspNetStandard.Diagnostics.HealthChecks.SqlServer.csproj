@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netstandard2.0</TargetFramework>
+		<!-- <TargetFramework>netstandard2.0</TargetFramework> -->
 		<TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<Authors>Andre Postiga</Authors>
@@ -39,6 +39,10 @@
 			✨ Feature
 		</PackageReleaseNotes>
 	</PropertyGroup>
+
+	<ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.0.0" />

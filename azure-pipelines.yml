@@ -102,11 +102,11 @@ stages:
     - script: |
         pwd && ls -la
         dotnet restore "$(solution_path)"
-        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(project_name)/bin "$(project_path -f "netstandard2.0;net461;net472"
-        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(redis_extension_name)/bin "$(redis_extension_path -f "netstandard2.0;net461;net472"
-        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(mongo_extension_name)/bin "$(mongo_extension_path -f "netstandard2.0;net461;net472"
-        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(rabbitmq_extension_name)/bin "$(rabbitmq_extension_path -f "netstandard2.0;net461;net472"
-        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)/bin "$(sqlserver_extension_path -f "netstandard2.0;net461;net472"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(project_name)/bin "$(project_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(redis_extension_name)/bin "$(redis_extension_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(mongo_extension_name)/bin "$(mongo_extension_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(rabbitmq_extension_name)/bin "$(rabbitmq_extension_path)"
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)/bin "$(sqlserver_extension_path)" 
         mkdir artifact
         cp -r $(System.DefaultWorkingDirectory)/binaries artifact/binaries
       displayName: Build Application
@@ -251,7 +251,7 @@ stages:
       PureVersion: $[ dependencies.PreBuild.outputs['PreBuildTask.PureVersion'] ]
     steps:
     - script: |
-          dotnet publish -c Release "$(project_path)" -f "netstandard2.0;net461;net472"
+          dotnet publish -c Release "$(project_path)" 
       displayName: Running Build for Packing
     - task: DotNetCoreCLI@2
       displayName: 'Packing HC Release'
@@ -318,10 +318,10 @@ stages:
     - job: PackingExtensions
       steps:
       - script: |
-            dotnet publish -c Release "$(redis_extension_path)" -f "netstandard2.0;net461;net472"
-            dotnet publish -c Release "$(mongo_extension_path)" -f "netstandard2.0;net461;net472"
-            dotnet publish -c Release "$(rabbitmq_extension_path)" -f "netstandard2.0;net461;net472"
-            dotnet publish -c Release "$(sqlserver_extension_path)" -f "netstandard2.0;net461;net472"
+            dotnet publish -c Release "$(redis_extension_path)" 
+            dotnet publish -c Release "$(mongo_extension_path)" 
+            dotnet publish -c Release "$(rabbitmq_extension_path)" 
+            dotnet publish -c Release "$(sqlserver_extension_path)" 
         displayName: Running Build for Packing    
       - task: DotNetCoreCLI@2
         displayName: 'Packing redisExtension Release'
