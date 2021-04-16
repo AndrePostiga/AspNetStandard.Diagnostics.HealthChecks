@@ -4,6 +4,8 @@ using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
 using Moq;
 using Newtonsoft.Json;
+using Serilog;
+using Serilog.Events;
 using System;
 using System.Net;
 using System.Net.Http;
@@ -15,13 +17,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
 {
     public class HealthCheckHandlerTests
     {
-        private readonly Mock<IHealthCheckService> _healthCheckServiceMock = new Mock<IHealthCheckService>();
-        private readonly HttpRequestMessage _httpMessageWithParameter;
-        private readonly HttpRequestMessage _httpMessage;
-        private readonly Mock<IHealthCheck> _healthyHealthCheckMock = new Mock<IHealthCheck>();
-        private readonly HealthCheckResult _healthyHealthCheckResult = new HealthCheckResult(HealthStatus.Healthy, "AnyDescription");
-        private readonly HealthCheckResultExtended _healthyHealthCheckResultExtended;
-        private readonly IHealthCheckConfiguration _hcConfiguration;
+        private Mock<IHealthCheckService> _healthCheckServiceMock = new Mock<IHealthCheckService>();
+        private HttpRequestMessage _httpMessageWithParameter;
+        private HttpRequestMessage _httpMessage;
+        private Mock<IHealthCheck> _healthyHealthCheckMock = new Mock<IHealthCheck>();
+        private HealthCheckResult _healthyHealthCheckResult = new HealthCheckResult(HealthStatus.Healthy, "AnyDescription");
+        private HealthCheckResultExtended _healthyHealthCheckResultExtended;
+        private IHealthCheckConfiguration _hcConfiguration;
 
         public HealthCheckHandlerTests()
         {
@@ -31,10 +33,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
 
             _hcConfiguration = new HealthChecksBuilder().HealthCheckConfig;
 
-            var hcResponse = new HealthCheckResponse();            
+            var hcResponse = new HealthCheckResponse();
             hcResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(
-                Task.Run(() => _healthyHealthCheckMock.Object.CheckHealthAsync()).Result    
-            ));            
+                Task.Run(() => _healthyHealthCheckMock.Object.CheckHealthAsync()).Result
+            ));
 
 
             _healthCheckServiceMock
@@ -52,28 +54,37 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             _httpMessage = new HttpRequestMessage()
             {
                 RequestUri = new Uri("http://anyDomain/health")
-            };            
+            };
         }
 
         [Fact(DisplayName = "Should call healthCheckAsync with correct parameters")]
         public async Task ShouldCallWithCorrectParameters()
-        {   
+        {
+            var loggerMock = new Mock<ILogger>();
+            loggerMock.Setup(l => l.Write(It.IsAny<LogEventLevel>(), It.IsAny<string>())).Verifiable();
+            _hcConfiguration.Logger = loggerMock.Object;
             var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
             await sut.HandleRequest(_httpMessage, It.IsAny<CancellationToken>());
             _healthCheckServiceMock.Verify(x => x.GetHealthAsync(It.IsAny<CancellationToken>()), Times.Once());
+            loggerMock.VerifyAll();
         }
 
         [Fact(DisplayName = "Should call healthCheckAsync overload with correct parameters if query parameter is passed")]
         public async Task ShouldCallWithCorrectParametersWithQueryParameter()
         {
+            var loggerMock = new Mock<ILogger>();
+            loggerMock.Setup(l => l.Write(It.IsAny<LogEventLevel>(), It.IsAny<string>())).Verifiable();
+            _hcConfiguration.Logger = loggerMock.Object;
+
             var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
             var act = await sut.HandleRequest(_httpMessageWithParameter, It.IsAny<CancellationToken>());
 
             _healthCheckServiceMock.Verify(x => x.GetHealthAsync("AnyImplementation", It.IsAny<CancellationToken>()), Times.Once());
-            _healthCheckServiceMock.Verify(x => x.GetHealthAsync(It.Is<string>(p => p == "AnyImplementation"), It.IsAny<CancellationToken>()),Times.Once());
+            _healthCheckServiceMock.Verify(x => x.GetHealthAsync(It.Is<string>(p => p == "AnyImplementation"), It.IsAny<CancellationToken>()), Times.Once());
 
             string json = JsonConvert.SerializeObject(_healthyHealthCheckResultExtended, _hcConfiguration.SerializerSettings);
 
+            loggerMock.VerifyAll();
             Assert.Equal(HttpStatusCode.OK, act.StatusCode);
             Assert.Equal(json, await act.Content.ReadAsStringAsync());
         }
@@ -85,11 +96,16 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
                 .Setup(x => x.GetHealthAsync("AnyImplementation", It.IsAny<CancellationToken>()))
                 .ThrowsAsync(new NotFoundError("AnyImplementation"));
 
+            var loggerMock = new Mock<ILogger>();
+            loggerMock.Setup(l => l.Error(It.IsAny<Exception>(), It.IsAny<string>())).Verifiable();
+            _hcConfiguration.Logger = loggerMock.Object;
+
             var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
             var act = await sut.HandleRequest(_httpMessageWithParameter, It.IsAny<CancellationToken>());
 
             string json = JsonConvert.SerializeObject(new NotFoundError("AnyImplementation").HttpErrorResponse, _hcConfiguration.SerializerSettings);
 
+            loggerMock.VerifyAll();
             Assert.Equal(HttpStatusCode.NotFound, act.StatusCode);
             Assert.Equal(json, await act.Content.ReadAsStringAsync());
         }
