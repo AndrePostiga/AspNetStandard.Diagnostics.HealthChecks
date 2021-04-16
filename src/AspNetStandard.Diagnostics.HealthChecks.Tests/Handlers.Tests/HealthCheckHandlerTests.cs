@@ -17,13 +17,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
 {
     public class HealthCheckHandlerTests
     {
-        private Mock<IHealthCheckService> _healthCheckServiceMock = new Mock<IHealthCheckService>();
-        private HttpRequestMessage _httpMessageWithParameter;
-        private HttpRequestMessage _httpMessage;
-        private Mock<IHealthCheck> _healthyHealthCheckMock = new Mock<IHealthCheck>();
-        private HealthCheckResult _healthyHealthCheckResult = new HealthCheckResult(HealthStatus.Healthy, "AnyDescription");
-        private HealthCheckResultExtended _healthyHealthCheckResultExtended;
-        private IHealthCheckConfiguration _hcConfiguration;
+        private readonly Mock<IHealthCheckService> _healthCheckServiceMock = new Mock<IHealthCheckService>();
+        private readonly HttpRequestMessage _httpMessageWithParameter;
+        private readonly HttpRequestMessage _httpMessage;
+        private readonly Mock<IHealthCheck> _healthyHealthCheckMock = new Mock<IHealthCheck>();
+        private readonly HealthCheckResult _healthyHealthCheckResult = new HealthCheckResult(HealthStatus.Healthy, "AnyDescription");
+        private readonly HealthCheckResultExtended _healthyHealthCheckResultExtended;
+        private readonly IHealthCheckConfiguration _hcConfiguration;
 
         public HealthCheckHandlerTests()
         {
