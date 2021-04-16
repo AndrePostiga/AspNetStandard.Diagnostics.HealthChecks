@@ -1,5 +1,4 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 

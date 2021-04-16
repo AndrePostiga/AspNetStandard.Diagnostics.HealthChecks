@@ -1,6 +1,7 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -15,15 +16,21 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             {HealthStatus.Degraded, HttpStatusCode.OK},
             {HealthStatus.Unhealthy, HttpStatusCode.ServiceUnavailable}
         };
+        private ILogger _logger;
+
+        public ILogger Logger
+        {
+            get => _logger;
+            set
+            {
+                if (value == null) return;
+                _logger = value;
+            }
+        }
 
         public IDictionary<string, Registration> HealthChecksDependencies { get; } = new Dictionary<string, Registration>(StringComparer.OrdinalIgnoreCase);
 
-        private string _apiKey;
-        public string ApiKey
-        {
-            get => _apiKey;
-            set => _apiKey = value;
-        }
+        public string ApiKey { get; set; }
 
 
         private JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()

@@ -7,7 +7,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 {
     public static class HttpConfigurationExtensions
     {
-        public static HealthChecksBuilder AddHealthChecks(this HttpConfiguration httpConfiguration, string healthEndpoint = "health", ILogger logger = null)
+        public static HealthChecksBuilder AddHealthChecks(this HttpConfiguration httpConfiguration, string healthEndpoint = "health")
         {
             var hcBuilder = new HealthChecksBuilder();
             var dependencyResolver = httpConfiguration.DependencyResolver;
@@ -20,7 +20,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 
             // Handler Instances
             var authenticationHandler = new AuthenticationHandler(hcConfig, authenticationService);
-            var healthCheckHandler = new HealthCheckHandler(hcConfig, healthChecksService, logger);
+            var healthCheckHandler = new HealthCheckHandler(hcConfig, healthChecksService);
 
             // ChainOfResponsibility
             authenticationHandler.SetNextHandler(healthCheckHandler);
