@@ -1,5 +1,6 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
+using Serilog;
 using System.Web.Http;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
@@ -11,6 +12,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             var hcBuilder = new HealthChecksBuilder();
             var dependencyResolver = httpConfiguration.DependencyResolver;
             var hcConfig = hcBuilder.HealthCheckConfig;
+
 
             // Service Instances
             var healthChecksService = new HealthCheckService(dependencyResolver, hcConfig.HealthChecksDependencies);

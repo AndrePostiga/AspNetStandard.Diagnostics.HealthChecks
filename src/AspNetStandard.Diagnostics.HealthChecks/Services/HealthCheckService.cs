@@ -105,7 +105,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
 
             return (IHealthCheck)_dependencyResolver.GetService(dependency.Type);
         }
-
-
     }
 }
