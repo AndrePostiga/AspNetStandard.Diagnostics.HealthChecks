@@ -36,7 +36,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             hcResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(
                 Task.Run(() => _healthyHealthCheckMock.Object.CheckHealthAsync()).Result
             ));
-
+          
             _healthCheckServiceMock
                 .Setup(x => x.GetHealthAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(hcResponse));
@@ -61,6 +61,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             var loggerMock = new Mock<ILogger>();
             loggerMock.Setup(l => l.Write(It.IsAny<LogEventLevel>(), It.IsAny<string>())).Verifiable();
             _hcConfiguration.Logger = loggerMock.Object;
+          
             var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
             await sut.HandleRequest(_httpMessage, It.IsAny<CancellationToken>());
             _healthCheckServiceMock.Verify(x => x.GetHealthAsync(It.IsAny<CancellationToken>()), Times.Once());
@@ -97,7 +98,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             var loggerMock = new Mock<ILogger>();
             loggerMock.Setup(l => l.Error(It.IsAny<Exception>(), It.IsAny<string>())).Verifiable();
             _hcConfiguration.Logger = loggerMock.Object;
-
             var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
             var act = await sut.HandleRequest(_httpMessageWithParameter, It.IsAny<CancellationToken>());
 

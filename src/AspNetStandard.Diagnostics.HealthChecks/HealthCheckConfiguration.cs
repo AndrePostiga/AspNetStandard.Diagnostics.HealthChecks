@@ -58,4 +58,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             return ResultStatusCodes[healthStatus];
         }
     }
+
 }

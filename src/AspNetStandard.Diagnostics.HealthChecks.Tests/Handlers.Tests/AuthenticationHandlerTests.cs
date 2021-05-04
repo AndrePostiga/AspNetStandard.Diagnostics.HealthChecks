@@ -37,7 +37,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             var hcCustomBuilder = new HealthChecksBuilder().UseAuthorization("AnotherApiKey");
 
             var sut = new AuthenticationHandler(hcCustomBuilder.HealthCheckConfig, _mockAuthService.Object);
-
             var act = await sut.HandleRequest(_httpRequestFake, default);
 
             string json = JsonConvert.SerializeObject(new ForbiddenError().HttpErrorResponse, hcCustomBuilder.HealthCheckConfig.SerializerSettings);
@@ -52,7 +51,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             var sut = new AuthenticationHandler(_hcBuilder.HealthCheckConfig, _mockAuthService.Object);
 
             await sut.HandleRequest(_httpRequestFake, default);
-
             _mockAuthService.Verify(x =>
                     x.ValidateApiKey(It.Is<string>(p => string.Equals(p, _wrongApiKey))
                 ),
@@ -82,6 +80,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
                 Times.Once()
             );
         }
+
 
         [Fact(DisplayName = "Should call nextHandler with correct parameters if validate pass")]
         public async Task ShouldCallNextHandlerWithCorrectParameters()
