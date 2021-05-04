@@ -7,30 +7,26 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
     {
         public HealthCheckResponse()
         {
-            Entries = new Dictionary<string, HealthCheckResultExtended>();
+            HealthChecks = new Dictionary<string, HealthCheckResultExtended>();
         }
 
-        public IDictionary<string, HealthCheckResultExtended> Entries { get; }
+        public IDictionary<string, HealthCheckResultExtended> HealthChecks { get; }
 
         public HealthStatus OverAllStatus
         {
             get
             {
-                var status = HealthStatus.Healthy;
-                foreach (var healthCheckResultExtended in Entries.Values)
+                if (HealthChecks.Values.Any(x => x.Status == HealthStatus.Unhealthy))
                 {
-                    if (healthCheckResultExtended.Status == HealthStatus.Unhealthy)
-                    {
-                        status = HealthStatus.Unhealthy;
-                        break;
-                    }
-
-                    if (healthCheckResultExtended.Status == HealthStatus.Degraded)
-                    {
-                        status = HealthStatus.Degraded;
-                    }
+                    return HealthStatus.Unhealthy;
                 }
-                return status;
+
+                if (HealthChecks.Values.Any(x => x.Status == HealthStatus.Degraded))
+                {
+                    return HealthStatus.Degraded;
+                }
+
+                return HealthStatus.Healthy;
             }
         }
 
@@ -38,7 +34,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         {
             get
             {
-                return Entries.Values.Sum(c => c.ResponseTime);
+                return HealthChecks.Values.Sum(c => c.ResponseTime);
             }
         }
     }

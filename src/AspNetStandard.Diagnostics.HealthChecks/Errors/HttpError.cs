@@ -3,16 +3,16 @@ using System.Net;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Errors
 {
-    internal class HttpError : Exception
+    internal abstract class HttpError : Exception
     {
         public object HttpErrorResponse { get; }
         public HttpStatusCode HttpErrorStatusCode { get; }
 
-        public HttpError(string errorMessage, HttpStatusCode statusCode) : base(errorMessage)
+        protected HttpError(string errorMessage, HttpStatusCode statusCode) : base(errorMessage)
         {
             HttpErrorResponse = new
             {
-                statusCode = statusCode,
+                statusCode,
                 message = errorMessage
             };
 

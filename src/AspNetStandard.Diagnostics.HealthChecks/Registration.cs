@@ -5,22 +5,22 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 {
     internal class Registration
     {
-        public Registration(IHealthCheck instance)
+        internal Registration(IHealthCheck instance)
         {
             Instance = instance;
             IsSingleton = true;
         }
 
-        public Registration(Type type)
+        internal Registration(Type type)
         {
             Type = type;
             IsSingleton = false;
         }
 
-        public IHealthCheck Instance { get; }
+        internal IHealthCheck Instance { get; }
 
-        public Type Type { get; set; }
+        internal Type Type { get; set; }
 
-        public bool IsSingleton { get; }
+        internal bool IsSingleton { get; }
     }
 }

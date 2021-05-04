@@ -8,17 +8,19 @@ namespace AspNetStandard.Diagnostics.HealthChecks
     {
         public static HealthChecksBuilder AddHealthChecks(this HttpConfiguration httpConfiguration, string healthEndpoint = "health")
         {
-            System.Diagnostics.Debug.WriteLine("Iniciei");
-            var healthChecksBuilder = new HealthChecksBuilder();
+            var hcBuilder = new HealthChecksBuilder();
+            var dependencyResolver = httpConfiguration.DependencyResolver;
+            var hcConfig = hcBuilder.HealthCheckConfig;
 
-            var healthChecksService = new HealthCheckService(healthChecksBuilder);
-            var authenticationService = new AuthenticationService(healthChecksBuilder);
+            // Service Instances
+            var healthChecksService = new HealthCheckService(dependencyResolver, hcConfig.HealthChecksDependencies);
+            var authenticationService = new AuthenticationService(hcConfig);
 
-            var dependencyHandler = new DependencyHandler(httpConfiguration, healthChecksBuilder);
-            var authenticationHandler = new AuthenticationHandler(authenticationService);
-            var healthCheckHandler = new HealthCheckHandler(healthChecksService);
+            // Handler Instances
+            var authenticationHandler = new AuthenticationHandler(hcConfig, authenticationService);
+            var healthCheckHandler = new HealthCheckHandler(hcConfig, healthChecksService);
 
-            dependencyHandler.SetNextHandler(authenticationHandler);
+            // ChainOfResponsibility
             authenticationHandler.SetNextHandler(healthCheckHandler);
 
             httpConfiguration.Routes.MapHttpRoute(
@@ -26,10 +28,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks
                 routeTemplate: healthEndpoint,
                 defaults: new { check = RouteParameter.Optional },
                 constraints: null,
-                handler: dependencyHandler
+                handler: authenticationHandler
             );
 
-            return healthChecksBuilder;
+            return hcBuilder;
         }
     }
 }

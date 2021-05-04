@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
@@ -9,6 +8,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
     {
         bool NeedAuthentication();
 
-        bool ValidateApiKey(HttpRequestMessage request);
+        bool ValidateApiKey(string apiKeyRequest);
     }
 }

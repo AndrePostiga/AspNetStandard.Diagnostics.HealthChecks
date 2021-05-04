@@ -38,7 +38,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.SqlServer
             }
             catch (Exception ex)
             {
-
                 return new HealthCheckResult(HealthStatus.Unhealthy, "SqlServer is unhealthy", ex);
             }
         }

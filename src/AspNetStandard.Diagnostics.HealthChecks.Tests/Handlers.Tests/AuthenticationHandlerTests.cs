@@ -1,107 +1,107 @@
-﻿using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Errors;
+using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
-using System;
-using Xunit;
 using Moq;
-using System.Net.Http;
-using AspNetStandard.Diagnostics.HealthChecks.Errors;
-using System.Net;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
 {
     public class AuthenticationHandlerTests
     {
-        private Mock<IAuthenticationService> mockAuthservice = new Mock<IAuthenticationService>();
-        private Mock<IHandler> mockNextHandler = new Mock<IHandler>();
-        private HttpRequestMessage anyHttpRequestMessage;
-
-        JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings
-        {
-            ContractResolver = new DefaultContractResolver() { NamingStrategy = new SnakeCaseNamingStrategy() },
-        };        
+        private readonly Mock<IAuthenticationService> _mockAuthService = new Mock<IAuthenticationService>();
+        private readonly Mock<IHandler> _mockNextHandler = new Mock<IHandler>();
+        private readonly HealthChecksBuilder _hcBuilder = new HealthChecksBuilder();
+        private readonly string _wrongApiKey;
+        private readonly HttpRequestMessage _httpRequestFake;
 
         public AuthenticationHandlerTests()
         {
+            _wrongApiKey = "123";
+            _httpRequestFake = new HttpRequestMessage(HttpMethod.Get, "http://anyurl.com/?apikey=" + _wrongApiKey);
 
-            anyHttpRequestMessage = It.IsAny<HttpRequestMessage>();
-
-            mockAuthservice.Setup(x => x.ValidateApiKey(anyHttpRequestMessage)).Returns(false);
-            mockAuthservice.Setup(x => x.NeedAuthentication()).Returns(true);
-            mockNextHandler.Setup(x => x.HandleRequest(anyHttpRequestMessage, default)).ReturnsAsync(It.IsAny<HttpResponseMessage>());
-        }        
-
-        [Fact(DisplayName = "Should return error if validation returns false")]
-        public async void ShouldReturnErrorIfValidationFails()
-        {
-            var sut = new AuthenticationHandler(mockAuthservice.Object);
-
-            var act = await sut.HandleRequest(anyHttpRequestMessage, default);                       
-
-            string json = JsonConvert.SerializeObject(new ForbiddenError().HttpErrorResponse, SerializerSettings);
-
-            Assert.Equal(HttpStatusCode.Forbidden, act.StatusCode);
-            Assert.Equal(json, await act.Content.ReadAsStringAsync());            
+            _mockAuthService.Setup(x => x.ValidateApiKey(It.IsAny<string>())).Returns(false);
+            _mockAuthService.Setup(x => x.ValidateApiKey("AnyApiKey")).Returns(true);
+            _mockAuthService.Setup(x => x.NeedAuthentication()).Returns(true);
+            _mockNextHandler.Setup(x => x.HandleRequest(_httpRequestFake, default)).ReturnsAsync(It.IsAny<HttpResponseMessage>());
         }
 
-        [Fact(DisplayName = "Should call validate apikey with correct httpRequestMessage ")]
-        public async void ShouldCallValidateWithCorrectArgument()
+        [Fact(DisplayName = "Should return error if validation returns false")]
+        public async Task ShouldReturnErrorIfValidationFails()
         {
-            var sut = new AuthenticationHandler(mockAuthservice.Object);
+            var hcCustomBuilder = new HealthChecksBuilder().UseAuthorization("AnotherApiKey");
 
-            var act = await sut.HandleRequest(anyHttpRequestMessage, default);
+            var sut = new AuthenticationHandler(hcCustomBuilder.HealthCheckConfig, _mockAuthService.Object);
 
-            mockAuthservice.Verify(x => x.ValidateApiKey(
-                    It.Is<HttpRequestMessage>(x => Object.ReferenceEquals(x, anyHttpRequestMessage))
-                ), 
+            var act = await sut.HandleRequest(_httpRequestFake, default);
+
+            string json = JsonConvert.SerializeObject(new ForbiddenError().HttpErrorResponse, hcCustomBuilder.HealthCheckConfig.SerializerSettings);
+
+            Assert.Equal(HttpStatusCode.Forbidden, act.StatusCode);
+            Assert.Equal(json, await act.Content.ReadAsStringAsync());
+        }
+
+        [Fact(DisplayName = "Should call validate apikey with correct api key")]
+        public async Task ShouldCallValidateWithCorrectArgument()
+        {
+            var sut = new AuthenticationHandler(_hcBuilder.HealthCheckConfig, _mockAuthService.Object);
+
+            await sut.HandleRequest(_httpRequestFake, default);
+
+            _mockAuthService.Verify(x =>
+                    x.ValidateApiKey(It.Is<string>(p => string.Equals(p, _wrongApiKey))
+                ),
                 Times.Once()
             );
         }
 
         [Fact(DisplayName = "Should call next handler with correct arguments if no authentication is needed")]
-        public async void ShouldSetNextHandlerCorrectly()
+        public async Task ShouldSetNextHandlerCorrectly()
         {
-            mockAuthservice.Setup(x => x.NeedAuthentication()).Returns(false);
+            _mockAuthService.Setup(x => x.NeedAuthentication()).Returns(false);
 
-            var sut = new AuthenticationHandler(mockAuthservice.Object);
+            var sut = new AuthenticationHandler(_hcBuilder.HealthCheckConfig, _mockAuthService.Object);
 
-            var actNextHandler = sut.SetNextHandler(mockNextHandler.Object);
+            var actNextHandler = sut.SetNextHandler(_mockNextHandler.Object);
 
             var cancellationToken = new CancellationTokenSource().Token;
 
-            var act = await sut.HandleRequest(anyHttpRequestMessage, cancellationToken);
+            await sut.HandleRequest(_httpRequestFake, cancellationToken);
 
             Assert.True(actNextHandler != null);
-            mockNextHandler.Verify(x => x.HandleRequest(anyHttpRequestMessage, cancellationToken), Times.Once());
-            mockNextHandler.Verify(x => x.HandleRequest(
-                    It.Is<HttpRequestMessage>(x => Object.ReferenceEquals(x, anyHttpRequestMessage)),
-                    It.Is<CancellationToken>(x => x == cancellationToken)
+            _mockNextHandler.Verify(x => x.HandleRequest(_httpRequestFake, cancellationToken), Times.Once());
+            _mockNextHandler.Verify(x => x.HandleRequest(
+                    It.Is<HttpRequestMessage>(y => Object.ReferenceEquals(y, _httpRequestFake)),
+                    It.Is<CancellationToken>(p => p == cancellationToken)
                 ),
                 Times.Once()
             );
-
         }
 
-        [Fact(DisplayName = "Should call nextHandler with correct parameters if validade pass")]
-        public async void ShouldCallNextHandlerWithCorrectParameters()
+        [Fact(DisplayName = "Should call nextHandler with correct parameters if validate pass")]
+        public async Task ShouldCallNextHandlerWithCorrectParameters()
         {
-            mockAuthservice.Setup(x => x.ValidateApiKey(anyHttpRequestMessage)).Returns(true);
-            var sut = new AuthenticationHandler(mockAuthservice.Object);
+            var httpRequestWithCorrectApiKey = new HttpRequestMessage(HttpMethod.Get, "http://anyurl.com/?apikey=AnyApiKey");
 
-            var actNextHandler = sut.SetNextHandler(mockNextHandler.Object);
+            var sut = new AuthenticationHandler(_hcBuilder.HealthCheckConfig, _mockAuthService.Object);
+
+            var actNextHandler = sut.SetNextHandler(_mockNextHandler.Object);
 
             var cancellationToken = new CancellationTokenSource().Token;
 
-            var act = await sut.HandleRequest(anyHttpRequestMessage, cancellationToken);
+            await sut.HandleRequest(httpRequestWithCorrectApiKey, cancellationToken);
 
             Assert.True(actNextHandler != null);
-            mockNextHandler.Verify(m => m.HandleRequest(anyHttpRequestMessage, cancellationToken), Times.Once());
-            mockNextHandler.Verify(x => x.HandleRequest( 
-                    It.Is<HttpRequestMessage>(x => Object.ReferenceEquals(x, anyHttpRequestMessage)), 
-                    It.Is<CancellationToken>(x => x == cancellationToken)
-                ), 
+            _mockNextHandler.Verify(m => m.HandleRequest(httpRequestWithCorrectApiKey, cancellationToken), Times.Once());
+            _mockNextHandler.Verify(x => x.HandleRequest(
+                    It.Is<HttpRequestMessage>(p => Object.ReferenceEquals(p, httpRequestWithCorrectApiKey)),
+                    It.Is<CancellationToken>(y => y == cancellationToken)
+                ),
                 Times.Once()
             );
         }

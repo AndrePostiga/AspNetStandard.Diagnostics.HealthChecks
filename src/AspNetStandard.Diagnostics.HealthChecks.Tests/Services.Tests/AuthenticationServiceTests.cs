@@ -1,56 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Services;
 using Xunit;
-using Moq;
-using System.Net.Http;
-using System.Collections.Specialized;
-using AspNetStandard.Diagnostics.HealthChecks.Services;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 {
     public class AuthenticationServiceTests
     {
-        HttpRequestMessage httpMessage;
+        private readonly IHealthCheckConfiguration _hcConfig;
+
         public AuthenticationServiceTests()
         {
-            httpMessage = new HttpRequestMessage()
-            {
-                RequestUri = new Uri("http://anyDomain/health?ApiKey=AnyApiKey")
-            };
+            _hcConfig = new HealthChecksBuilder()
+                .UseAuthorization("AnyApiKey")
+                .HealthCheckConfig;
         }
 
-        [Fact(DisplayName ="Should return true when apiKey is correctly")]
-        public void ShoudlReturnTrueOnValidation()
+        [Fact(DisplayName = "Should return true when apiKey is correctly")]
+        public void ShouldReturnTrueOnValidation()
         {
-            var builder = new HealthChecksBuilder().UseAuthorization("AnyApiKey");
-            var sut = new AuthenticationService(builder);
-
-            var act = sut.ValidateApiKey(httpMessage);
-
-            Assert.True(act == true);
+            var sut = new AuthenticationService(_hcConfig);
+            var act = sut.ValidateApiKey("AnyApiKey");
+            Assert.True(act);
         }
 
         [Fact(DisplayName = "Should validate if authorization is needed")]
-        public void ShoudlReturnTrueIfNeedValidation()
+        public void ShouldReturnTrueIfNeedValidation()
         {
-            var builder = new HealthChecksBuilder().UseAuthorization("AnyApiKey");
-            var sut = new AuthenticationService(builder);
-
+            var sut = new AuthenticationService(_hcConfig);
             var act = sut.NeedAuthentication();
-
-            Assert.True(act == true);
+            Assert.True(act);
         }
 
         [Fact(DisplayName = "Should validate if authorization is not needed")]
-        public void ShoudlReturnTrueIfNoNeedValidation()
+        public void ShouldReturnTrueIfNoNeedValidation()
         {
-            var builder = new HealthChecksBuilder();
-            var sut = new AuthenticationService(builder);
+            var customConfig = new HealthChecksBuilder()
+                .HealthCheckConfig;
 
+            var sut = new AuthenticationService(customConfig);
             var act = sut.NeedAuthentication();
-
-            Assert.True(act == false);
+            Assert.False(act);
         }
     }
 }

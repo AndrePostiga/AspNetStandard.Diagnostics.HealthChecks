@@ -1,4 +1,11 @@
-﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
+﻿///
+/// This extension is based on official .net healthcheck library
+/// the original implementation is avaiable on:
+/// https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks/blob/master/src/HealthChecks.Redis/RedisHealthCheck.cs
+/// 
+
+
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
@@ -32,7 +39,31 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Redis
                     }
                 }
 
-                await connection.GetDatabase().PingAsync();
+                foreach (var endPoint in connection.GetEndPoints(configuredOnly: true))
+                {
+                    var server = connection.GetServer(endPoint);
+
+                    if (server.ServerType != ServerType.Cluster)
+                    {
+                        await connection.GetDatabase().PingAsync();
+                        await server.PingAsync();
+                    }
+                    else
+                    {
+                        var clusterInfo = await server.ExecuteAsync("CLUSTER", "INFO");
+                        if (clusterInfo is object && !clusterInfo.IsNull)
+                        {
+                            if (!clusterInfo.ToString().Contains("cluster_state:ok"))
+                            {
+                                return new HealthCheckResult(HealthStatus.Unhealthy, description: $"INFO CLUSTER is not on OK state for endpoint {endPoint}");
+                            }
+                        }
+                        else
+                        {
+                            return new HealthCheckResult(HealthStatus.Unhealthy, description: $"INFO CLUSTER is null or can't be read for endpoint {endPoint}");
+                        }
+                    }
+                }
 
                 return new HealthCheckResult(HealthStatus.Healthy, "Redis is healthy");
             }

@@ -20,15 +20,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public Exception Exception { get; }
 
-
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is HealthCheckResult))
+            if (!(obj is HealthCheckResult item))
             {
                 return false;
             }
-
-            var item = obj as HealthCheckResult;
 
             return (
                 this.Description == item.Description

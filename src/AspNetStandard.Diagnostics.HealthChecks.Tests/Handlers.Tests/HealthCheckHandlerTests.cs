@@ -1,106 +1,92 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading;
-using System.Threading.Tasks;
-using AspNetStandard.Diagnostics.HealthChecks.Entities;
+﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using AspNetStandard.Diagnostics.HealthChecks.Errors;
 using AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
 using Moq;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
 {
     public class HealthCheckHandlerTests
     {
-        private Mock<IHealthCheckService> mockHcService = new Mock<IHealthCheckService>();
-        private CancellationToken anyTokenInstance;
-        private HttpRequestMessage httpMessageWithParameter;
-        private HttpRequestMessage httpMessage;
-        private Mock<IHealthCheck> mockHealthyHC = new Mock<IHealthCheck>();
-        private HealthCheckResult HcResult;
-        private HealthCheckResultExtended HcResultExtended;
-
-        private JsonSerializerSettings SerializerSettings { get; } = new JsonSerializerSettings
-        {
-            ContractResolver = new DefaultContractResolver() { NamingStrategy = new SnakeCaseNamingStrategy() },
-        };
+        private readonly Mock<IHealthCheckService> _healthCheckServiceMock = new Mock<IHealthCheckService>();
+        private readonly HttpRequestMessage _httpMessageWithParameter;
+        private readonly HttpRequestMessage _httpMessage;
+        private readonly Mock<IHealthCheck> _healthyHealthCheckMock = new Mock<IHealthCheck>();
+        private readonly HealthCheckResult _healthyHealthCheckResult = new HealthCheckResult(HealthStatus.Healthy, "AnyDescription");
+        private readonly HealthCheckResultExtended _healthyHealthCheckResultExtended;
+        private readonly IHealthCheckConfiguration _hcConfiguration;
 
         public HealthCheckHandlerTests()
         {
-            anyTokenInstance = new CancellationTokenSource().Token;
-            HcResult = new HealthCheckResult(HealthStatus.Healthy, "AnyDescription", null);
-            HcResultExtended = new HealthCheckResultExtended(HcResult) { ResponseTime = null, LastExecution = DateTime.MinValue};
-            mockHealthyHC.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(HcResult));
-            
+            _healthyHealthCheckResultExtended = new HealthCheckResultExtended(_healthyHealthCheckResult) { ResponseTime = null, LastExecution = DateTime.MinValue };
+            _healthyHealthCheckMock.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(_healthyHealthCheckResult));
 
-            var hcResponse = new HealthCheckResponse();            
-            hcResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(
-                Task.Run(() => mockHealthyHC.Object.CheckHealthAsync()).Result    
+            _hcConfiguration = new HealthChecksBuilder().HealthCheckConfig;
+
+            var hcResponse = new HealthCheckResponse();
+            hcResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(
+                Task.Run(() => _healthyHealthCheckMock.Object.CheckHealthAsync()).Result
             ));
 
-            mockHcService.Setup(x => x.GetStatusCode(It.IsAny<HealthStatus>())).Returns(HttpStatusCode.OK);
-            mockHcService.Setup(x => x.GetHealthAsync(anyTokenInstance)).ReturnsAsync(hcResponse);            
-            mockHcService.Setup(x => x.GetHealthAsync("AnyImplementation")).ReturnsAsync(HcResultExtended);            
+            _healthCheckServiceMock
+                .Setup(x => x.GetHealthAsync(It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(hcResponse));
 
-            httpMessageWithParameter = new HttpRequestMessage()
+            _healthCheckServiceMock
+                .Setup(x => x.GetHealthAsync("AnyImplementation", It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(_healthyHealthCheckResultExtended));
+
+            _httpMessageWithParameter = new HttpRequestMessage()
             {
                 RequestUri = new Uri("http://anyDomain/health?check=AnyImplementation")
             };
-            httpMessage = new HttpRequestMessage()
+            _httpMessage = new HttpRequestMessage()
             {
                 RequestUri = new Uri("http://anyDomain/health")
-            };            
+            };
         }
 
         [Fact(DisplayName = "Should call healthCheckAsync with correct parameters")]
-        public async void ShouldCallWithCorrectParameters()
-        {   
-            var sut = new HealthCheckHandler(mockHcService.Object);
-
-            var act = await sut.HandleRequest(httpMessage, anyTokenInstance);
-
-            mockHcService.Verify(x => x.GetHealthAsync(anyTokenInstance), Times.Once());
-            mockHcService.Verify(x => x.GetHealthAsync(
-                    It.Is<CancellationToken>(x => x == anyTokenInstance)
-                ),
-                Times.Once()
-            );
+        public async Task ShouldCallWithCorrectParameters()
+        {
+            var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
+            await sut.HandleRequest(_httpMessage, It.IsAny<CancellationToken>());
+            _healthCheckServiceMock.Verify(x => x.GetHealthAsync(It.IsAny<CancellationToken>()), Times.Once());
         }
 
         [Fact(DisplayName = "Should call healthCheckAsync overload with correct parameters if query parameter is passed")]
-        public async void ShouldCallWithCorrectParametersWithQueryParameter()
+        public async Task ShouldCallWithCorrectParametersWithQueryParameter()
         {
-            var sut = new HealthCheckHandler(mockHcService.Object);
+            var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
+            var act = await sut.HandleRequest(_httpMessageWithParameter, It.IsAny<CancellationToken>());
 
-            var act = await sut.HandleRequest(httpMessageWithParameter, anyTokenInstance);
+            _healthCheckServiceMock.Verify(x => x.GetHealthAsync("AnyImplementation", It.IsAny<CancellationToken>()), Times.Once());
+            _healthCheckServiceMock.Verify(x => x.GetHealthAsync(It.Is<string>(p => p == "AnyImplementation"), It.IsAny<CancellationToken>()), Times.Once());
 
-            mockHcService.Verify(x => x.GetHealthAsync("AnyImplementation"), Times.Once());
-            mockHcService.Verify(x => x.GetHealthAsync(
-                    It.Is<string>(x => x == "AnyImplementation")
-                ),
-                Times.Once()
-            );
-
-            string json = JsonConvert.SerializeObject(HcResultExtended, SerializerSettings);
+            string json = JsonConvert.SerializeObject(_healthyHealthCheckResultExtended, _hcConfiguration.SerializerSettings);
 
             Assert.Equal(HttpStatusCode.OK, act.StatusCode);
             Assert.Equal(json, await act.Content.ReadAsStringAsync());
         }
 
         [Fact(DisplayName = "Should return not found error if hc throws")]
-        public async Task ShouldReturnErroIfCheckWasNotFound()
+        public async Task ShouldReturnErrorIfCheckWasNotFound()
         {
-            mockHcService.Setup(x => x.GetHealthAsync("AnyImplementation")).ThrowsAsync(new NotFoundError("AnyImplementation"));
+            _healthCheckServiceMock
+                .Setup(x => x.GetHealthAsync("AnyImplementation", It.IsAny<CancellationToken>()))
+                .ThrowsAsync(new NotFoundError("AnyImplementation"));
 
-            var sut = new HealthCheckHandler(mockHcService.Object);
+            var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
+            var act = await sut.HandleRequest(_httpMessageWithParameter, It.IsAny<CancellationToken>());
 
-            var act = await sut.HandleRequest(httpMessageWithParameter, anyTokenInstance);            
-
-            string json = JsonConvert.SerializeObject(new NotFoundError("AnyImplementation").HttpErrorResponse, SerializerSettings);            
+            string json = JsonConvert.SerializeObject(new NotFoundError("AnyImplementation").HttpErrorResponse, _hcConfiguration.SerializerSettings);
 
             Assert.Equal(HttpStatusCode.NotFound, act.StatusCode);
             Assert.Equal(json, await act.Content.ReadAsStringAsync());

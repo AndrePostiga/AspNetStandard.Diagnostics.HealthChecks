@@ -1,34 +1,22 @@
-﻿using System;
-using System.Net.Http;
-
-namespace AspNetStandard.Diagnostics.HealthChecks.Services
+﻿namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
     internal class AuthenticationService : IAuthenticationService
     {
-        private HealthChecksBuilder _healthChecksBuilder { get; }
-        public string ApiKey { get => _healthChecksBuilder.ApiKey; }
+        private readonly IHealthCheckConfiguration _hcConfig;
 
-        public AuthenticationService(HealthChecksBuilder healthChecksBuilder)
+        public AuthenticationService(IHealthCheckConfiguration hcConfig)
         {
-            _healthChecksBuilder = healthChecksBuilder;
+            _hcConfig = hcConfig;
         }
 
-        public bool ValidateApiKey(HttpRequestMessage request)
+        public bool ValidateApiKey(string apiKeyRequest)
         {
-            //query.TryGetValue
-            var query = request.RequestUri.ParseQueryString();
-            string key = query["ApiKey"];
-            return (key == ApiKey);
+            return apiKeyRequest == _hcConfig.ApiKey;
         }
 
         public bool NeedAuthentication()
         {
-            if (String.IsNullOrWhiteSpace(ApiKey))
-            {
-                return false;
-            }
-
-            return true;
+            return !string.IsNullOrWhiteSpace(_hcConfig.ApiKey);
         }
     }
 }

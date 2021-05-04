@@ -1,12 +1,12 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using AspNetStandard.Diagnostics.HealthChecks.Errors;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http.Dependencies;
 
 [assembly: InternalsVisibleTo("AspNetStandard.Diagnostics.HealthChecks.Tests")]
 
@@ -14,19 +14,22 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
     internal class HealthCheckService : IHealthCheckService
     {
-        private HealthChecksBuilder _healthChecksBuilder { get; }
+        private readonly IDependencyResolver _dependencyResolver;
+        private readonly IDictionary<string, Registration> _registeredChecks;
 
-        public HealthCheckService(HealthChecksBuilder healthChecksBuilder)
+        public HealthCheckService(IDependencyResolver dependencyResolver, IDictionary<string, Registration> registeredChecks)
         {
-            _healthChecksBuilder = healthChecksBuilder;
+            _dependencyResolver = dependencyResolver ?? throw new ArgumentNullException(nameof(dependencyResolver));
+            _registeredChecks = registeredChecks ?? throw new ArgumentNullException(nameof(registeredChecks));
         }
 
         public async Task<HealthCheckResponse> GetHealthAsync(CancellationToken cancellationToken = default)
         {
             var healthCheckResponse = new HealthCheckResponse();
+            var healthChecks = ResolveDependencies();
             var sw = new Stopwatch();
 
-            foreach (var task in _healthChecksBuilder.HealthChecks)
+            foreach (var task in healthChecks)
             {
                 try
                 {
@@ -36,7 +39,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                     var result = await task.Value.CheckHealthAsync(cancellationToken);
                     sw.Stop();
 
-                    healthCheckResponse.Entries.Add(task.Key, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
+                    healthCheckResponse.HealthChecks.Add(task.Key, new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds });
                 }
                 catch (OperationCanceledException)
                 {
@@ -44,29 +47,29 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 }
                 catch
                 {
-                    healthCheckResponse.Entries.Add(task.Key, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
+                    healthCheckResponse.HealthChecks.Add(task.Key, new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)));
                 }
             }
 
             return healthCheckResponse;
         }
 
-        public async Task<HealthCheckResultExtended> GetHealthAsync(string healthCheckName)
+        public async Task<HealthCheckResultExtended> GetHealthAsync(string healthCheckName, CancellationToken cancellationToken = default)
         {
-            if (!_healthChecksBuilder.HealthChecks.TryGetValue(healthCheckName, out var healthCheck))
+            if (!_registeredChecks.TryGetValue(healthCheckName, out Registration healthCheckRegistration))
             {
                 throw new NotFoundError(healthCheckName);
             }
+
+            var healthCheck = ResolveDependencies(healthCheckRegistration);
 
             try
             {
                 var sw = new Stopwatch();
                 sw.Reset();
                 sw.Start();
-                var result = await healthCheck.CheckHealthAsync();
-
+                var result = await healthCheck.CheckHealthAsync(cancellationToken);
                 sw.Stop();
-
                 return new HealthCheckResultExtended(result) { ResponseTime = sw.ElapsedMilliseconds };
             }
             catch
@@ -75,9 +78,32 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
             }
         }
 
-        public HttpStatusCode GetStatusCode(HealthStatus healthstatus)
+        private Dictionary<string, IHealthCheck> ResolveDependencies()
         {
-            return _healthChecksBuilder.ResultStatusCodes[healthstatus];
+            using (var dependencyScope = _dependencyResolver.BeginScope())
+            {
+                var result = new Dictionary<string, IHealthCheck>();
+
+                foreach (var registration in _registeredChecks)
+                {
+                    result.Add(
+                        registration.Key,
+                        ResolveDependencies(registration.Value)
+                    );
+                }
+
+                return result;
+            }
+        }
+
+        private IHealthCheck ResolveDependencies(Registration dependency)
+        {
+            if (dependency.IsSingleton)
+            {
+                return dependency.Instance;
+            }
+
+            return (IHealthCheck)_dependencyResolver.GetService(dependency.Type);
         }
     }
 }

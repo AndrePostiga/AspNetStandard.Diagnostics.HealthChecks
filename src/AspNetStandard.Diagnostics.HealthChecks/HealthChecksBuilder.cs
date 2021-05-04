@@ -1,64 +1,49 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Net;
 
 namespace AspNetStandard.Diagnostics.HealthChecks
 {
-    public class HealthChecksBuilder
+    public sealed class HealthChecksBuilder
     {
-        internal HealthChecksBuilder()
-        {
-        }
-
-        internal IDictionary<HealthStatus, HttpStatusCode> ResultStatusCodes { get; } = new Dictionary<HealthStatus, HttpStatusCode>(3)
-        {
-            {HealthStatus.Healthy, HttpStatusCode.OK},
-            {HealthStatus.Degraded, HttpStatusCode.OK},
-            {HealthStatus.Unhealthy, HttpStatusCode.ServiceUnavailable}
-        };
-
-        internal IDictionary<string, Registration> HealthChecksDependencies { get; } = new Dictionary<string, Registration>(StringComparer.OrdinalIgnoreCase);
-
-        internal IDictionary<string, IHealthCheck> HealthChecks { get; set; }
-
-        internal bool AddWarningHeader { get; private set; } = true;
+        internal HealthCheckConfiguration HealthCheckConfig { get; } = new HealthCheckConfiguration();
 
         public HealthChecksBuilder AddCheck(string name, IHealthCheck healthCheck)
         {
-            HealthChecksDependencies.Add(name, new Registration(healthCheck));
-
+            HealthCheckConfig.HealthChecksDependencies.Add(name, new Registration(healthCheck));
             return this;
         }
 
         public HealthChecksBuilder AddCheck<T>(string name) where T : IHealthCheck
         {
-            HealthChecksDependencies.Add(name, new Registration(typeof(T)));
-
+            HealthCheckConfig.HealthChecksDependencies.Add(name, new Registration(typeof(T)));
             return this;
         }
 
         public HealthChecksBuilder AddCheck(string name, Func<HealthCheckResult> check)
         {
-            HealthChecksDependencies.Add(name, new Registration(new LambdaHealthCheck(check)));
-
+            HealthCheckConfig.HealthChecksDependencies.Add(name, new Registration(new LambdaHealthCheck(check)));
             return this;
         }
 
         public HealthChecksBuilder OverrideResultStatusCodes(HttpStatusCode healthy = HttpStatusCode.OK, HttpStatusCode degraded = HttpStatusCode.OK, HttpStatusCode unhealthy = HttpStatusCode.ServiceUnavailable)
         {
-            ResultStatusCodes[HealthStatus.Healthy] = healthy;
-            ResultStatusCodes[HealthStatus.Degraded] = degraded;
-            ResultStatusCodes[HealthStatus.Unhealthy] = unhealthy;
-
+            HealthCheckConfig.ResultStatusCodes[HealthStatus.Healthy] = healthy;
+            HealthCheckConfig.ResultStatusCodes[HealthStatus.Degraded] = degraded;
+            HealthCheckConfig.ResultStatusCodes[HealthStatus.Unhealthy] = unhealthy;
             return this;
         }
 
-        internal string ApiKey = null;
-
         public HealthChecksBuilder UseAuthorization(string apiKey)
         {
-            ApiKey = apiKey;
+            HealthCheckConfig.ApiKey = apiKey;
+            return this;
+        }
+
+        public HealthChecksBuilder ConfigureJsonSerializerSettings(JsonSerializerSettings settings)
+        {
+            HealthCheckConfig.SerializerSettings = settings;
             return this;
         }
     }
