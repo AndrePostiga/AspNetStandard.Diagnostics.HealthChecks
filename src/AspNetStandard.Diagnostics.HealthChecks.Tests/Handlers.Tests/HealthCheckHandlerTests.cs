@@ -38,9 +38,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             
 
             var hcResponse = new HealthCheckResponse();            
-            hcResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(
-                Task.Run(() => mockHealthyHC.Object.CheckHealthAsync()).Result    
-            ));
+            hcResponse.Entries.Add("AnyImplementation", new HealthCheckResultExtended(HcResult));
 
             mockHcService.Setup(x => x.GetStatusCode(It.IsAny<HealthStatus>())).Returns(HttpStatusCode.OK);
             mockHcService.Setup(x => x.GetHealthAsync(anyTokenInstance)).ReturnsAsync(hcResponse);            
