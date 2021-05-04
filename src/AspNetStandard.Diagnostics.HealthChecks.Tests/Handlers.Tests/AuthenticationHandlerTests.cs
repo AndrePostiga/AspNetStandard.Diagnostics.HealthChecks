@@ -39,7 +39,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             var sut = new AuthenticationHandler(hcCustomBuilder.HealthCheckConfig, _mockAuthService.Object);
             var act = await sut.HandleRequest(_httpRequestFake, default);
 
-            string json = JsonConvert.SerializeObject(new ForbiddenError().HttpErrorResponse, hcCustomBuilder.HealthCheckConfig.SerializerSettings);
+            string json = JsonConvert.SerializeObject(new ForbiddenError(_wrongApiKey).HttpErrorResponse, hcCustomBuilder.HealthCheckConfig.SerializerSettings);
 
             Assert.Equal(HttpStatusCode.Forbidden, act.StatusCode);
             Assert.Equal(json, await act.Content.ReadAsStringAsync());
