@@ -4,9 +4,9 @@
 		<!-- <TargetFramework>netstandard2.0</TargetFramework> -->
 		<TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<Authors>Andre Postiga</Authors>
+		<Authors>Andre Postiga, Samuel Leite (Co-author), Tiago Resende (reviewer)</Authors>
 		<Company>Andre Postiga</Company>
-		<Version>1.0.1</Version>
+		<Version>1.1.0</Version>
 		<PackageProjectUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</RepositoryUrl>
 		<Description>Project based on Kirill's and Kpol's project. Original project avaiable on GitHub Link: (https://github.com/kpol/WebApi.HealthChecks) and my new version: (https://github.com/AndrePostiga/WebApi.HealthChecks)</Description>
@@ -20,21 +20,12 @@
 		<RootNamespace>AspNetStandard.Diagnostics.HealthChecks.MongoDb</RootNamespace>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReleaseNotes>
-			Release Notes v1.0.1:
+			Release Notes v1.1.0:
 
-			🐛 Implementing IDisposable on RabbitMQ extension to not keep connections after check
-			🐛 Implementing thread safe check on RabbitMQ extension
-			🐛 Implementing cluster check on Redis extension to teste clustered redis
-			🐛 CancellationToken now is passed to GetHealthAsync on unique service checks
-			🎨 Refactor code typos, iterations to lambdas, spells, modifiers, broken tests, code smells
-			🎨 Refactor handlers to decrease code lines and refactor dependency resolver to application services
-			🎨 Refactor builter to generate an healthCheck configuration class and passes it to handlers and services
-			🎨 Refactor AuthenticationHandler to read query parameters instead of AuthenticationService
-			✨ Add the possibility to configure JsonSerializerSettings
-			❌ Deletion of dependency handler and dependency handler tests
+			✨ Adds the possibility to use the log in the HealthCheck result
+			🎨 Refactoring the unit test to pass the log
 
 			Legend:
-			🐛 Bug
 			🎨 Refactor
 			✨ Feature
 		</PackageReleaseNotes>
