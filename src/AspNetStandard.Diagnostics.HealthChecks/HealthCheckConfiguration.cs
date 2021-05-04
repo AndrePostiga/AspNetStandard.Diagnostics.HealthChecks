@@ -20,7 +20,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 
         public string ApiKey { get; set; }
 
-
         private JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
         {
             ContractResolver = new DefaultContractResolver()
@@ -29,7 +28,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
                 {
                     ProcessDictionaryKeys = true
                 }
-            }            
+            }
         };
 
         public JsonSerializerSettings SerializerSettings
@@ -37,16 +36,14 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             get => _serializerSettings;
             set
             {
-                if (value == null) return;                
+                if (value == null) return;
                 _serializerSettings = value;
             }
         }
 
-        public HttpStatusCode GetStatusCode(HealthStatus healthstatus)
+        public HttpStatusCode GetStatusCode(HealthStatus healthStatus)
         {
-            return ResultStatusCodes[healthstatus];
+            return ResultStatusCodes[healthStatus];
         }
-
     }
 }
-

@@ -25,17 +25,15 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
 
         public HealthCheckHandlerTests()
         {
-
             _healthyHealthCheckResultExtended = new HealthCheckResultExtended(_healthyHealthCheckResult) { ResponseTime = null, LastExecution = DateTime.MinValue };
             _healthyHealthCheckMock.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(_healthyHealthCheckResult));
 
             _hcConfiguration = new HealthChecksBuilder().HealthCheckConfig;
 
-            var hcResponse = new HealthCheckResponse();            
+            var hcResponse = new HealthCheckResponse();
             hcResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(
-                Task.Run(() => _healthyHealthCheckMock.Object.CheckHealthAsync()).Result    
-            ));            
-
+                Task.Run(() => _healthyHealthCheckMock.Object.CheckHealthAsync()).Result
+            ));
 
             _healthCheckServiceMock
                 .Setup(x => x.GetHealthAsync(It.IsAny<CancellationToken>()))
@@ -52,12 +50,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             _httpMessage = new HttpRequestMessage()
             {
                 RequestUri = new Uri("http://anyDomain/health")
-            };            
+            };
         }
 
         [Fact(DisplayName = "Should call healthCheckAsync with correct parameters")]
         public async Task ShouldCallWithCorrectParameters()
-        {   
+        {
             var sut = new HealthCheckHandler(_hcConfiguration, _healthCheckServiceMock.Object);
             await sut.HandleRequest(_httpMessage, It.IsAny<CancellationToken>());
             _healthCheckServiceMock.Verify(x => x.GetHealthAsync(It.IsAny<CancellationToken>()), Times.Once());
@@ -70,7 +68,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             var act = await sut.HandleRequest(_httpMessageWithParameter, It.IsAny<CancellationToken>());
 
             _healthCheckServiceMock.Verify(x => x.GetHealthAsync("AnyImplementation", It.IsAny<CancellationToken>()), Times.Once());
-            _healthCheckServiceMock.Verify(x => x.GetHealthAsync(It.Is<string>(p => p == "AnyImplementation"), It.IsAny<CancellationToken>()),Times.Once());
+            _healthCheckServiceMock.Verify(x => x.GetHealthAsync(It.Is<string>(p => p == "AnyImplementation"), It.IsAny<CancellationToken>()), Times.Once());
 
             string json = JsonConvert.SerializeObject(_healthyHealthCheckResultExtended, _hcConfiguration.SerializerSettings);
 

@@ -20,13 +20,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             }
 
             return await HandleRequest(request, cancellationToken);
-        }        
+        }
 
         protected HttpResponseMessage MakeResponse<T>(T objectContent, HttpStatusCode statusCode)
         {
             var response = new HttpResponseMessage(statusCode)
             {
-                Content = new ObjectContent<T>(objectContent, new JsonMediaTypeFormatter { SerializerSettings = _hcConfig.SerializerSettings})
+                Content = new ObjectContent<T>(objectContent, new JsonMediaTypeFormatter { SerializerSettings = _hcConfig.SerializerSettings })
             };
 
             return response;

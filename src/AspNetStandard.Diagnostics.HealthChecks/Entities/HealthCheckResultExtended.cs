@@ -17,7 +17,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public DateTime LastExecution { get; set; }
 
-
         public override bool Equals(object obj)
         {
             if (!(obj is HealthCheckResult))

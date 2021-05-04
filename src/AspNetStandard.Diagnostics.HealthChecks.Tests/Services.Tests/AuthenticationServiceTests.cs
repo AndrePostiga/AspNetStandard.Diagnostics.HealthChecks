@@ -14,7 +14,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
                 .HealthCheckConfig;
         }
 
-        [Fact(DisplayName ="Should return true when apiKey is correctly")]
+        [Fact(DisplayName = "Should return true when apiKey is correctly")]
         public void ShouldReturnTrueOnValidation()
         {
             var sut = new AuthenticationService(_hcConfig);
