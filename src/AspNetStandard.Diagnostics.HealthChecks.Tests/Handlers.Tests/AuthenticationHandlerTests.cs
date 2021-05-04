@@ -36,7 +36,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
         {
             var hcCustomBuilder = new HealthChecksBuilder().UseAuthorization("AnotherApiKey");
 
-            var sut = new AuthenticationHandler(hcCustomBuilder.HealthCheckConfig, _mockAuthService.Object);            
+            var sut = new AuthenticationHandler(hcCustomBuilder.HealthCheckConfig, _mockAuthService.Object);
 
             var act = await sut.HandleRequest(_httpRequestFake, default);
 
@@ -45,23 +45,21 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             Assert.Equal(HttpStatusCode.Forbidden, act.StatusCode);
             Assert.Equal(json, await act.Content.ReadAsStringAsync());
         }
-        
 
         [Fact(DisplayName = "Should call validate apikey with correct api key")]
         public async Task ShouldCallValidateWithCorrectArgument()
         {
             var sut = new AuthenticationHandler(_hcBuilder.HealthCheckConfig, _mockAuthService.Object);
 
-            await sut.HandleRequest(_httpRequestFake, default);         
+            await sut.HandleRequest(_httpRequestFake, default);
 
-            _mockAuthService.Verify(x => 
+            _mockAuthService.Verify(x =>
                     x.ValidateApiKey(It.Is<string>(p => string.Equals(p, _wrongApiKey))
                 ),
                 Times.Once()
             );
         }
 
-      
         [Fact(DisplayName = "Should call next handler with correct arguments if no authentication is needed")]
         public async Task ShouldSetNextHandlerCorrectly()
         {
@@ -83,13 +81,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
                 ),
                 Times.Once()
             );
-
         }
-       
+
         [Fact(DisplayName = "Should call nextHandler with correct parameters if validate pass")]
         public async Task ShouldCallNextHandlerWithCorrectParameters()
-        {           
-            var httpRequestWithCorrectApiKey = new HttpRequestMessage(HttpMethod.Get, "http://anyurl.com/?apikey=AnyApiKey");            
+        {
+            var httpRequestWithCorrectApiKey = new HttpRequestMessage(HttpMethod.Get, "http://anyurl.com/?apikey=AnyApiKey");
 
             var sut = new AuthenticationHandler(_hcBuilder.HealthCheckConfig, _mockAuthService.Object);
 
@@ -108,6 +105,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
                 Times.Once()
             );
         }
-      
     }
 }

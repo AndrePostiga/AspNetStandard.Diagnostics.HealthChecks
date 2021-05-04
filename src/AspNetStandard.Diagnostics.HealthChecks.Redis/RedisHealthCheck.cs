@@ -1,4 +1,11 @@
-﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
+﻿///
+/// This extension is based on official .net healthcheck library
+/// the original implementation is avaiable on:
+/// https://github.com/Xabaril/AspNetCore.Diagnostics.HealthChecks/blob/master/src/HealthChecks.Redis/RedisHealthCheck.cs
+/// 
+
+
+using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using StackExchange.Redis;
 using System;
 using System.Collections.Concurrent;
@@ -28,9 +35,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Redis
                     if (!_connections.TryAdd(_redisConnectionString, connection))
                     {
                         connection.Dispose();
-                        connection = _connections[_redisConnectionString]; 
+                        connection = _connections[_redisConnectionString];
                     }
-
                 }
 
                 foreach (var endPoint in connection.GetEndPoints(configuredOnly: true))
@@ -54,7 +60,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Redis
                         }
                         else
                         {
-                            return new HealthCheckResult(HealthStatus.Unhealthy, description: $"INFO CLUSTER is null or can't be read for endpoint {endPoint}");                            
+                            return new HealthCheckResult(HealthStatus.Unhealthy, description: $"INFO CLUSTER is null or can't be read for endpoint {endPoint}");
                         }
                     }
                 }

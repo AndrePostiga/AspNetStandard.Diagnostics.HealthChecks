@@ -25,11 +25,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             _unhealthyHealthCheckMock.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(new HealthCheckResult(HealthStatus.Unhealthy, "AnyDescription")));
             _throwableHealthCheckMock.Setup(x => x.CheckHealthAsync(default)).ThrowsAsync(new Exception("AnyException"));
         }
-         
+
         [Fact(DisplayName = "Should return correct status code if builder remain not modified")]
         public void ShouldGetStandardStatusCode()
         {
-
             var sut = _healthCheckBuilder.HealthCheckConfig;
 
             var actDegradedStatusCode = sut.GetStatusCode(HealthStatus.Degraded);
@@ -74,16 +73,14 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 
             var expectedResponse = new HealthCheckResponse();
             expectedResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(await _healthyHealthCheckMock.Object.CheckHealthAsync()));
-            
+
             Assert.Equal(expectedResponse.OverAllStatus, actResponse.OverAllStatus);
-            Assert.Equal(expectedResponse.HealthChecks, actResponse.HealthChecks);            
+            Assert.Equal(expectedResponse.HealthChecks, actResponse.HealthChecks);
         }
 
-        
         [Fact(DisplayName = "Should cancel check if CancellationToken if token was canceled")]
         public void ShouldCancelCheck()
         {
-
             var hcDependencies = _healthCheckBuilder
                 .AddCheck("AnyImplementation", _healthyHealthCheckMock.Object)
                 .HealthCheckConfig
@@ -101,11 +98,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             Assert.ThrowsAsync<OperationCanceledException>(act);
         }
 
-
         [Fact(DisplayName = "Should return unhealthy response if GetHealth throws exception")]
         public async Task ShouldReturnUnhealthyIfThrows()
         {
-
             var hcDependencies = _healthCheckBuilder
                 .AddCheck("AnyImplementation", _throwableHealthCheckMock.Object)
                 .HealthCheckConfig
@@ -121,7 +116,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             Assert.Equal(HealthStatus.Unhealthy, actResponse.OverAllStatus);
             Assert.Equal(expectedResponse.HealthChecks, actResponse.HealthChecks);
         }
-
 
         [Fact(DisplayName = "Should return degraded status if at least one check is degraded")]
         public async Task ShouldReturnDegradedOverAll()
@@ -165,7 +159,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             Assert.Equal(expectedResponse.HealthChecks, actResponse.HealthChecks);
         }
 
-
         [Fact(DisplayName = "Should check specific health check searched by name")]
         public async Task ShouldCheckByName()
         {
@@ -179,8 +172,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 
             var actResponse = await sut.GetHealthAsync("AnotherImplementation");
 
-            var expectedResponse = new HealthCheckResultExtended(await _unhealthyHealthCheckMock.Object.CheckHealthAsync());            
-            
+            var expectedResponse = new HealthCheckResultExtended(await _unhealthyHealthCheckMock.Object.CheckHealthAsync());
+
             Assert.Equal(expectedResponse, actResponse);
         }
 
@@ -202,7 +195,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
             Assert.Equal(expectedResponse, actResponse);
         }
 
-
         [Fact(DisplayName = "Should throw error if specific HC not founded")]
         public void ShouldReturnNullIfSearchedCheckNotFound()
         {
@@ -218,6 +210,5 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Services.Tests
 
             Assert.ThrowsAsync<OperationCanceledException>(act);
         }
-
     }
 }

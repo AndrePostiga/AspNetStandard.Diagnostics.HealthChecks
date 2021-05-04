@@ -9,7 +9,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
         {
             HealthChecks = new Dictionary<string, HealthCheckResultExtended>();
         }
-        
+
         public IDictionary<string, HealthCheckResultExtended> HealthChecks { get; }
 
         public HealthStatus OverAllStatus
@@ -20,12 +20,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Entities
                 {
                     return HealthStatus.Unhealthy;
                 }
-                
+
                 if (HealthChecks.Values.Any(x => x.Status == HealthStatus.Degraded))
                 {
                     return HealthStatus.Degraded;
                 }
-                
+
                 return HealthStatus.Healthy;
             }
         }
