@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
 {
-    public class RabbitMqHealthCheck : IHealthCheck, IDisposable 
+    public class RabbitMqHealthCheck : IHealthCheck, IDisposable
     {
         private bool _disposed;
         private static volatile object _sync = new object();
@@ -74,7 +74,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
         private void Dispose(bool disposing)
         {
             if (_disposed) return;
-            
+
             if (disposing)
             {
                 _connection?.Close();

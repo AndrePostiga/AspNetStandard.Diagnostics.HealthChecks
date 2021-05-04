@@ -37,7 +37,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             catch (NotFoundError error)
             {
                 return MakeResponse(error.HttpErrorResponse, error.HttpErrorStatusCode);
-            }            
+            }
         }
     }
 }
