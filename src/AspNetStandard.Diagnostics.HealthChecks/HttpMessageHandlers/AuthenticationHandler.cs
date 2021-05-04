@@ -1,4 +1,5 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Errors;
+using AspNetStandard.Diagnostics.HealthChecks.Seedwork;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
 using System;
 using System.Linq;
@@ -12,9 +13,11 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
     {
         private IHandler _nextHandler;
         private readonly IAuthenticationService _authService;
+        private readonly IHealthCheckConfiguration _hcConfig;
 
         public AuthenticationHandler(IHealthCheckConfiguration healthCheckConfiguration, IAuthenticationService service) : base(healthCheckConfiguration)
         {
+            _hcConfig = healthCheckConfiguration;
             _authService = service;
         }
 
@@ -36,7 +39,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
 
             if (!_authService.ValidateApiKey(apiKey))
             {
-                var error = new ForbiddenError();
+                var error = new ForbiddenError(apiKey);
+                _hcConfig.Logger?.LogException(error);
                 return MakeResponse(error.HttpErrorResponse, error.HttpErrorStatusCode);
             }
 
