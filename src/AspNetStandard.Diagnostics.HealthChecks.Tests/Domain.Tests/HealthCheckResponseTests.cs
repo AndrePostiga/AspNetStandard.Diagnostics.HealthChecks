@@ -11,7 +11,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
 
         public HealthCheckResponseTests()
         {
-            _healthyResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Healthy)) { ResponseTime = 1};
+            _healthyResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Healthy)) { ResponseTime = 1 };
             _degradedResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Degraded)) { ResponseTime = 1 };
             _unhealthyResult = new HealthCheckResultExtended(new HealthCheckResult(HealthStatus.Unhealthy)) { ResponseTime = 1 };
         }
@@ -24,7 +24,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
             sut.HealthChecks.Add("AnyAnotherName", _degradedResult);
 
             Assert.Equal(HealthStatus.Degraded, sut.OverAllStatus);
-
         }
 
         [Fact(DisplayName = "Should return unhealthy if at least one status is unhealthy")]
@@ -36,7 +35,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
             sut.HealthChecks.Add("UnhealthyAnotherName", _unhealthyResult);
 
             Assert.Equal(HealthStatus.Unhealthy, sut.OverAllStatus);
-
         }
 
         [Fact(DisplayName = "Should return healthy if all status is healthy")]
@@ -48,7 +46,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Domain.Tests
             sut.HealthChecks.Add("UnhealthyAnotherName", _healthyResult);
 
             Assert.Equal(HealthStatus.Healthy, sut.OverAllStatus);
-
         }
 
         [Fact(DisplayName = "Should sum correctly totalResponseTime")]

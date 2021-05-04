@@ -1,6 +1,6 @@
 ﻿
 using AspNetStandard.Diagnostics.HealthChecks.Errors;
-using AspNetStandard.Diagnostics.HealthChecks.Helpers;
+using AspNetStandard.Diagnostics.HealthChecks.Seedwork;
 using AspNetStandard.Diagnostics.HealthChecks.Services;
 using System;
 using System.Linq;
@@ -30,21 +30,18 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                 if (queryParameters.TryGetValue("check", out var check) && !string.IsNullOrWhiteSpace(check))
                 {
                     var healthResult = await _hcService.GetHealthAsync(check, cancellationToken);
-                    if (_hcConfig.Logger != null)
-                        LogHelper.LogHealthCheck(_hcConfig.Logger, healthResult, healthResult.Status, check);
+                    _hcConfig.Logger?.LogHealthCheck(healthResult, healthResult.Status, check);
                     return MakeResponse(healthResult, _hcConfig.GetStatusCode(healthResult.Status));
                 }
 
                 var result = await _hcService.GetHealthAsync(cancellationToken);
-                if (_hcConfig.Logger != null)
-                    LogHelper.LogHealthCheck(_hcConfig.Logger, result, result.OverAllStatus);
+                _hcConfig.Logger?.LogHealthCheck(result, result.OverAllStatus);
 
                 return MakeResponse(result, _hcConfig.GetStatusCode(result.OverAllStatus));
             }
             catch (NotFoundError error)
             {
-                if (_hcConfig.Logger != null)
-                    LogHelper.LogException(_hcConfig.Logger, error);
+                _hcConfig.Logger?.LogException(error);
                 return MakeResponse(error.HttpErrorResponse, error.HttpErrorStatusCode);
             }
         }

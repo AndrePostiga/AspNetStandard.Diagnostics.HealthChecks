@@ -4,13 +4,13 @@ using Serilog.Context;
 using Serilog.Events;
 using System;
 
-namespace AspNetStandard.Diagnostics.HealthChecks.Helpers
+namespace AspNetStandard.Diagnostics.HealthChecks.Seedwork
 {
-    public static class LogHelper
+    public static class LoggerExtension
     {
         private static readonly string _messageTemplate = "[{ApplicationName}: HealthCheck] ";
 
-        public static void LogHealthCheck(ILogger logger, object content, HealthStatus status, string message = "")
+        public static void LogHealthCheck(this ILogger logger, object content, HealthStatus status, string message = "")
         {
             LogContext.PushProperty("Content", content, true);
             var typeLog = LogEventLevel.Information;
@@ -20,7 +20,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Helpers
             logger.Write(typeLog, _messageTemplate + message + " - " + status);
         }
 
-        public static void LogException(ILogger logger, Exception error)
+        public static void LogException(this ILogger logger, Exception error)
         {
             logger.Error(error, _messageTemplate);
         }

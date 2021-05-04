@@ -32,7 +32,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks
 
         public string ApiKey { get; set; }
 
-
         private JsonSerializerSettings _serializerSettings = new JsonSerializerSettings()
         {
             ContractResolver = new DefaultContractResolver()
@@ -54,11 +53,9 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             }
         }
 
-        public HttpStatusCode GetStatusCode(HealthStatus healthstatus)
+        public HttpStatusCode GetStatusCode(HealthStatus healthStatus)
         {
-            return ResultStatusCodes[healthstatus];
+            return ResultStatusCodes[healthStatus];
         }
-
     }
 }
-

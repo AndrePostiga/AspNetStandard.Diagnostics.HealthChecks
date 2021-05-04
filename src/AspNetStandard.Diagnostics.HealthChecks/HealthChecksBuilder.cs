@@ -20,16 +20,19 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             HealthCheckConfig.HealthChecksDependencies.Add(name, new Registration(healthCheck));
             return this;
         }
+
         public HealthChecksBuilder AddCheck<T>(string name) where T : IHealthCheck
         {
             HealthCheckConfig.HealthChecksDependencies.Add(name, new Registration(typeof(T)));
             return this;
         }
+
         public HealthChecksBuilder AddCheck(string name, Func<HealthCheckResult> check)
         {
             HealthCheckConfig.HealthChecksDependencies.Add(name, new Registration(new LambdaHealthCheck(check)));
             return this;
         }
+
         public HealthChecksBuilder OverrideResultStatusCodes(HttpStatusCode healthy = HttpStatusCode.OK, HttpStatusCode degraded = HttpStatusCode.OK, HttpStatusCode unhealthy = HttpStatusCode.ServiceUnavailable)
         {
             HealthCheckConfig.ResultStatusCodes[HealthStatus.Healthy] = healthy;
@@ -37,11 +40,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             HealthCheckConfig.ResultStatusCodes[HealthStatus.Unhealthy] = unhealthy;
             return this;
         }
+
         public HealthChecksBuilder UseAuthorization(string apiKey)
         {
             HealthCheckConfig.ApiKey = apiKey;
             return this;
         }
+
         public HealthChecksBuilder ConfigureJsonSerializerSettings(JsonSerializerSettings settings)
         {
             HealthCheckConfig.SerializerSettings = settings;

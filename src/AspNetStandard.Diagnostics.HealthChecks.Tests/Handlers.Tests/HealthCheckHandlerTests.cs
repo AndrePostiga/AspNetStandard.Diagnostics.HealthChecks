@@ -27,7 +27,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
 
         public HealthCheckHandlerTests()
         {
-
             _healthyHealthCheckResultExtended = new HealthCheckResultExtended(_healthyHealthCheckResult) { ResponseTime = null, LastExecution = DateTime.MinValue };
             _healthyHealthCheckMock.Setup(x => x.CheckHealthAsync(default)).Returns(Task.FromResult(_healthyHealthCheckResult));
 
@@ -37,7 +36,6 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Tests.Handlers.Tests
             hcResponse.HealthChecks.Add("AnyImplementation", new HealthCheckResultExtended(
                 Task.Run(() => _healthyHealthCheckMock.Object.CheckHealthAsync()).Result
             ));
-
 
             _healthCheckServiceMock
                 .Setup(x => x.GetHealthAsync(It.IsAny<CancellationToken>()))

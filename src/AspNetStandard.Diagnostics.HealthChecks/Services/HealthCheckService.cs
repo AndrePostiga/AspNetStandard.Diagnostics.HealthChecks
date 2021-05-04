@@ -14,8 +14,8 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
 {
     internal class HealthCheckService : IHealthCheckService
     {
-        private IDependencyResolver _dependencyResolver;
-        private IDictionary<string, Registration> _registeredChecks;
+        private readonly IDependencyResolver _dependencyResolver;
+        private readonly IDictionary<string, Registration> _registeredChecks;
 
         public HealthCheckService(IDependencyResolver dependencyResolver, IDictionary<string, Registration> registeredChecks)
         {
@@ -27,7 +27,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
         {
             var healthCheckResponse = new HealthCheckResponse();
             var healthChecks = ResolveDependencies();
-            var sw = new Stopwatch();            
+            var sw = new Stopwatch();
 
             foreach (var task in healthChecks)
             {
@@ -80,18 +80,20 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
 
         private Dictionary<string, IHealthCheck> ResolveDependencies()
         {
-            var result = new Dictionary<string, IHealthCheck>();
-
-            _dependencyResolver.BeginScope();
-            foreach (var registration in _registeredChecks)
+            using (var dependencyScope = _dependencyResolver.BeginScope())
             {
-                result.Add(
-                    registration.Key,
-                    ResolveDependencies(registration.Value)
-                );
-            }
+                var result = new Dictionary<string, IHealthCheck>();
 
-            return result;
+                foreach (var registration in _registeredChecks)
+                {
+                    result.Add(
+                        registration.Key,
+                        ResolveDependencies(registration.Value)
+                    );
+                }
+
+                return result;
+            }
         }
 
         private IHealthCheck ResolveDependencies(Registration dependency)
@@ -101,9 +103,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Services
                 return dependency.Instance;
             }
 
-            return (IHealthCheck)_dependencyResolver.GetService(dependency.Type);            
+            return (IHealthCheck)_dependencyResolver.GetService(dependency.Type);
         }
-
-
     }
 }
