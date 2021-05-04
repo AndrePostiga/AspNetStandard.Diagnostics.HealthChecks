@@ -8,7 +8,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Seedwork
 {
     public static class LoggerExtension
     {
-        private static readonly string _messageTemplate = "[{ApplicationName}: HealthCheck] ";
+        private static readonly string _messageTemplate = "[{Application}: HealthCheck] ";
 
         public static void LogHealthCheck(this ILogger logger, object content, HealthStatus status, string message = "")
         {
