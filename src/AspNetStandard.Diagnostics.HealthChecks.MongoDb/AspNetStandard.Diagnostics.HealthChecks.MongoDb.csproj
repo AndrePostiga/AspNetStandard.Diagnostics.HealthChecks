@@ -34,7 +34,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.1.0" />
+		<PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.1.1" />
 		<PackageReference Include="MongoDB.Driver" Version="2.7.0" />
 	</ItemGroup>
 

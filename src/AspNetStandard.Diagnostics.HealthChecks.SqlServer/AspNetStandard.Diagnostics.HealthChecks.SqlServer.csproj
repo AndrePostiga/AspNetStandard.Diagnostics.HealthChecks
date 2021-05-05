@@ -34,7 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.1.0" />
+		<PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.1.1" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
 	</ItemGroup>
 
