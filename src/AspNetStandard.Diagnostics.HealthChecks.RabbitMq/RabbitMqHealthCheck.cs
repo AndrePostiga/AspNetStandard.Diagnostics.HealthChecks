@@ -86,13 +86,22 @@ namespace AspNetStandard.Diagnostics.HealthChecks.RabbitMq
 
         private static ConnectionFactory CreateFactory(Uri connectionString, SslOption sslOption)
         {
-            return new ConnectionFactory()
+            if(sslOption != null)
             {
-                Uri = connectionString,
-                AutomaticRecoveryEnabled = true,
-                UseBackgroundThreadsForIO = true,
-                Ssl = sslOption ?? new SslOption()
-            };
+                return new ConnectionFactory()
+                {
+                    Uri = connectionString,
+                    Ssl = sslOption
+                };
+            } 
+            else
+            {
+                return new ConnectionFactory()
+                {
+                    Uri = connectionString
+                };
+            }
+            
         }
     }
 }
