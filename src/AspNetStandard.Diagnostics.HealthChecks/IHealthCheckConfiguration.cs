@@ -1,6 +1,7 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using Newtonsoft.Json;
 using Serilog;
+using Serilog.Core.Enrichers;
 using System.Collections.Generic;
 using System.Net;
 
@@ -13,6 +14,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
         string ApiKey { get; set; }
         JsonSerializerSettings SerializerSettings { get; set; }
         ILogger Logger { get; set; }
+        PropertyEnricher[] LoggerProperties { get; }
         HttpStatusCode GetStatusCode(HealthStatus healthstatus);
     }
 }

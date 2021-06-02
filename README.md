@@ -32,6 +32,9 @@ O seu check também pode possuir uma camada de autenticação que utiliza uma `A
 `Checks`
 Para incluir um check na lista de verificação, basta passar um objeto que implemente a interface `IHealthCheck ` e adicionar uma referência de chave valor para o método `AddCheck(NomeDoHealthChek, InstânciaDoHealthCheck)`
 
+`Logging`
+Os seus checks podem ser logados a cada requisição, tenha ela falhado ou não. A biblioteca implementa o ILogger e espera que o cliente passe uma instância concreta que implemente a interface para fazer os logs
+
 #### `Adicionando HealthChecks Personalizados`
 A biblioteca ainda está em fase de desenvolvimento e provavelmente ela não possui todas as implementações de HealthCheck para todos os serviços existentes. Para garantir a generalização e extensão da biblioteca para outros casos de uso, é possível implementar uma interface do projeto, desenvolver seu próprio check e utilizar na configuração inicial da aplicação.
 

@@ -40,7 +40,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
             if (!_authService.ValidateApiKey(apiKey))
             {
                 var error = new ForbiddenError(apiKey);
-                _hcConfig.Logger?.LogException(error);
+                _hcConfig.Logger?.LogException(error, _hcConfig.LoggerProperties);
                 return MakeResponse(error.HttpErrorResponse, error.HttpErrorStatusCode);
             }
 

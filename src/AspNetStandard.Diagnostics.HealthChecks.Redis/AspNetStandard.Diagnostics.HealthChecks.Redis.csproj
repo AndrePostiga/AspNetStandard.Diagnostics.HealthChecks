@@ -6,7 +6,7 @@
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<Authors>Andre Postiga, Samuel Leite (Co-author), Tiago Resende (reviewer)</Authors>
 		<Company>Andre Postiga</Company>
-		<Version>1.1.1</Version>
+		<Version>1.2.0</Version>
 		<PackageProjectUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</RepositoryUrl>
 		<Description>Project based on Kirill's and Kpol's project. Original project avaiable on GitHub Link: (https://github.com/kpol/WebApi.HealthChecks) and my new version: (https://github.com/AndrePostiga/WebApi.HealthChecks)</Description>
@@ -20,12 +20,12 @@
 		<RootNamespace>AspNetStandard.Diagnostics.HealthChecks.Redis</RootNamespace>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReleaseNotes>
-			Release Notes v1.1.1:
+			Release Notes v1.2.0:
 
-			🎨 Change Log Template
+			✨ Now users can add more log properties to enrich Log information
 
 			Legend:
-			🎨 Refactor
+			✨ Feature
 		</PackageReleaseNotes>
 	</PropertyGroup>
 

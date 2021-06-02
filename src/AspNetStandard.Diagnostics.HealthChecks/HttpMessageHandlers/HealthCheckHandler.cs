@@ -30,18 +30,18 @@ namespace AspNetStandard.Diagnostics.HealthChecks.HttpMessageHandlers
                 if (queryParameters.TryGetValue("check", out var check) && !string.IsNullOrWhiteSpace(check))
                 {
                     var healthResult = await _hcService.GetHealthAsync(check, cancellationToken);
-                    _hcConfig.Logger?.LogHealthCheck(healthResult, healthResult.Status, check);
+                    _hcConfig.Logger?.LogHealthCheck(healthResult, healthResult.Status, _hcConfig.LoggerProperties, check);
                     return MakeResponse(healthResult, _hcConfig.GetStatusCode(healthResult.Status));
                 }
 
                 var result = await _hcService.GetHealthAsync(cancellationToken);
-                _hcConfig.Logger?.LogHealthCheck(result, result.OverAllStatus);
+                _hcConfig.Logger?.LogHealthCheck(result, result.OverAllStatus, _hcConfig.LoggerProperties);
 
                 return MakeResponse(result, _hcConfig.GetStatusCode(result.OverAllStatus));
             }
             catch (NotFoundError error)
             {
-                _hcConfig.Logger?.LogException(error);
+                _hcConfig.Logger?.LogException(error, _hcConfig.LoggerProperties);
                 return MakeResponse(error.HttpErrorResponse, error.HttpErrorStatusCode);
             }
         }
