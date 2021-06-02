@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Serilog;
+using Serilog.Core.Enrichers;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -16,7 +17,23 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             {HealthStatus.Degraded, HttpStatusCode.OK},
             {HealthStatus.Unhealthy, HttpStatusCode.ServiceUnavailable}
         };
-        private ILogger _logger;
+
+        private PropertyEnricher[] _loggerProperties;
+        public PropertyEnricher[] LoggerProperties
+        {
+            get => _loggerProperties;
+            set
+            {
+                if (value == null)
+                {
+                    _loggerProperties = new PropertyEnricher[] { new PropertyEnricher("Lib", "HealthCheck", true) };
+                }
+
+                _loggerProperties = value;
+            }
+        }
+
+        private ILogger _logger;        
 
         public ILogger Logger
         {

@@ -1,6 +1,7 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
 using Newtonsoft.Json;
 using Serilog;
+using Serilog.Core.Enrichers;
 using System;
 using System.Net;
 
@@ -9,9 +10,10 @@ namespace AspNetStandard.Diagnostics.HealthChecks
     public sealed class HealthChecksBuilder
     {
         internal HealthCheckConfiguration HealthCheckConfig { get; } = new HealthCheckConfiguration();
-        public HealthChecksBuilder UseLogger(ILogger logger)
+        public HealthChecksBuilder UseLogger(ILogger logger, params PropertyEnricher[] properties)
         {
             HealthCheckConfig.Logger = logger;
+            HealthCheckConfig.LoggerProperties = properties;
             return this;
         }
 
