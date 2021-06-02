@@ -18,17 +18,13 @@ namespace AspNetStandard.Diagnostics.HealthChecks
             {HealthStatus.Unhealthy, HttpStatusCode.ServiceUnavailable}
         };
 
-        private PropertyEnricher[] _loggerProperties;
+        private PropertyEnricher[] _loggerProperties = new PropertyEnricher[] { new PropertyEnricher("Lib", "HealthCheck", true) };
         public PropertyEnricher[] LoggerProperties
         {
             get => _loggerProperties;
             set
             {
-                if (value == null)
-                {
-                    _loggerProperties = new PropertyEnricher[] { new PropertyEnricher("Lib", "HealthCheck", true) };
-                }
-
+                if (value == null) return;
                 _loggerProperties = value;
             }
         }
