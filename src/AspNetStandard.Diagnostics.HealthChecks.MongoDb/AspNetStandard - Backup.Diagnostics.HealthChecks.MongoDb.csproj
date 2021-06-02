@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- <TargetFramework>netstandard2.0</TargetFramework> -->
+		<TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Authors>Andre Postiga, Samuel Leite (Co-author), Tiago Resende (reviewer)</Authors>
+		<Company>Andre Postiga</Company>
+		<Version>1.1.1</Version>
+		<PackageProjectUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</RepositoryUrl>
+		<Description>Project based on Kirill's and Kpol's project. Original project avaiable on GitHub Link: (https://github.com/kpol/WebApi.HealthChecks) and my new version: (https://github.com/AndrePostiga/WebApi.HealthChecks)</Description>
+		<RepositoryType>Git</RepositoryType>
+		<PackageTags>web, web-api, health, health-check, aspnet-standard</PackageTags>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<Title>AspNetStandard.Diagnostics.HealthChecks.MongoDb</Title>
+		<Description>WebApi extension of the health check for mongodb health reporting.</Description>
+		<FileVersion>1.0.0.0</FileVersion>
+		<AssemblyName>AspNetStandard.Diagnostics.HealthChecks.MongoDb</AssemblyName>
+		<RootNamespace>AspNetStandard.Diagnostics.HealthChecks.MongoDb</RootNamespace>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReleaseNotes>
+			Release Notes v1.1.1:
+
+			🎨 Change Log Template
+
+			Legend:
+			🎨 Refactor
+		</PackageReleaseNotes>
+	</PropertyGroup>
+
+	<ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.1.1" />
+		<PackageReference Include="MongoDB.Driver" Version="2.7.0" />
+	</ItemGroup>
+
+</Project>
