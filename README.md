@@ -1,8 +1,12 @@
 
 
 [![Nuget Version](https://img.shields.io/nuget/v/AspNetStandard.Diagnostics.HealthChecks?style=plastic)](https://www.nuget.org/packages/AspNetStandard.Diagnostics.HealthChecks/)
-
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=AndrePostiga_AspNetStandard.Diagnostics.HealthChecks&metric=alert_status)](https://sonarcloud.io/dashboard?id=AndrePostiga_AspNetStandard.Diagnostics.HealthChecks)
+![Nuget](https://img.shields.io/nuget/dt/AspNetStandard.Diagnostics.HealthChecks?label=HealthChecks%20downloads)
+![Nuget](https://img.shields.io/nuget/dt/AspNetStandard.Diagnostics.HealthChecks.MongoDb?label=HealthChecks.MongoDb%20downloads)
+![Nuget](https://img.shields.io/nuget/dt/AspNetStandard.Diagnostics.HealthChecks.RabbitMq?label=HealthChecks.RabbitMq%20downloads)
+![Nuget](https://img.shields.io/nuget/dt/AspNetStandard.Diagnostics.HealthChecks.Redis?label=HealthChecks.Redis%20downloads)
+![Nuget](https://img.shields.io/nuget/dt/AspNetStandard.Diagnostics.HealthChecks.SqlServer?label=HealthChecks.SqlServer%20downloads)
 
 
 
