@@ -48,10 +48,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HealthCheckResponse.cs" />
-    <Compile Include="HealthCheckService.cs" />
+    <Compile Include="Entities\WcfHealthCheckResponse.cs" />
+    <Compile Include="WcfHealthCheckService.cs" />
+    <Compile Include="WcfHealthCheckBuilder.cs" />
+    <Compile Include="WcfHealthCheck.cs" />
+    <Compile Include="WcfHealthCheckConfiguration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RouteExtension.cs" />
+    <Compile Include="WcfHeathCheckRouteExtension.cs" />
+    <Compile Include="Entities\WcfHealthCheckResult.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks.SqlServer\AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj">
@@ -63,5 +67,6 @@
       <Name>AspNetStandard.Diagnostics.HealthChecks</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
