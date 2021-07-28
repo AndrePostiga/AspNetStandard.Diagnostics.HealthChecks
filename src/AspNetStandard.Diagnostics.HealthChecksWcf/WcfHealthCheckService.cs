@@ -31,6 +31,7 @@ namespace AspNetStandard.Diagnostics.HealthChecksWcf
                 healthCheckResponse.GenerateWcfResult(dependency.Key, result);
             }
 
+            healthCheckResponse.OverAllStatus = healthCheckResponse.GetOverallStatus();
             return healthCheckResponse;
         }
     }

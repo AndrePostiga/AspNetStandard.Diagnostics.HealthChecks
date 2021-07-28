@@ -17,12 +17,12 @@ namespace AspNetStandard.Diagnostics.HealthChecksWcf.Entities
         }
 
         [DataMember]
-        public string Status { get { return OverallStatus(); } set { Status = value; } }
+        public string OverAllStatus { get; set; }
 
         [DataMember]
         public IDictionary<string, WcfHealthCheckResult> HealthChecks { get; set; }
 
-        private string OverallStatus()
+        public string GetOverallStatus()
         {
             if (HealthChecks.Values.Any(x => x.Status == HealthStatus.Unhealthy.ToString()))
             {
