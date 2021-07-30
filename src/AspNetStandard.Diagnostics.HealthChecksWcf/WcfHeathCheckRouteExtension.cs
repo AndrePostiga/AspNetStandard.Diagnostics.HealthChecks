@@ -5,7 +5,7 @@ namespace AspNetStandard.Diagnostics.HealthChecksWcf
 {
     public static class WcfHeathCheckRouteExtension
     {
-        public static WcfHealthCheckBuilder AddHealthChecks()
+        public static WcfHealthCheckBuilder AddWcfHealthCheck()
         {
             RouteTable.Routes.Add(new ServiceRoute("health/", new WebServiceHostFactory(),
               typeof(WcfHealthCheckService)));
