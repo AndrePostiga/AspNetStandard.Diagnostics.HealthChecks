@@ -2,7 +2,7 @@
 
 namespace AspNetStandard.Diagnostics.HealthChecksWcf
 {
-    public class WcfHealthCheckBuilder
+    public sealed class WcfHealthCheckBuilder
     {
         public WcfHealthCheckBuilder AddCheck(string name, IHealthCheck healthCheck)
         {
