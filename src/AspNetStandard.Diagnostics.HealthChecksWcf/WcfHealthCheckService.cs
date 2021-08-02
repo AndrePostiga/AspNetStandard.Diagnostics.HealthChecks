@@ -17,8 +17,10 @@ namespace AspNetStandard.Diagnostics.HealthChecksWcf
 
         [OperationContract]
         [WebInvoke(
-           Method = "GET",
-           UriTemplate = "")]
+            Method = "GET",
+            UriTemplate = "",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json)]
         public WcfHealthCheckResponse ExecuteHealthCheck()
         {
             var healthCheckResponse = new WcfHealthCheckResponse();
