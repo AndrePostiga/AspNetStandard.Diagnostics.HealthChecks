@@ -7,7 +7,7 @@ AspnetStandard.Diagnostics.HealthChecks.Wcf é uma extensão da biblioteca Aspne
 aplicações WCF (Windows Communication Foundation).
 
 ### `Como utilizar`
-A configuração da biblioteca é feita adicionando no Application_Start do Global.asax, uma chamada para o método AddWcfHealthCheck da classe WcfHeathCheckRouteExtension.
+A configuração da biblioteca é feita adicionando no Application_Start do Global.asax, uma chamada para o método AddWcfHealthCheck da classe WcfHealthCheckRouteExtension.
 Esse método é responsável por adicionar uma nova rota de HealthCheck à tabela de rotas da aplicação, e também retorna a instância de um builder que será responsável
 por adicionar as dependências da aplicação que serão análisadas no HealthCheck.
 
@@ -31,7 +31,7 @@ public class WebApiApplication : System.Web.HttpApplication
     {
         protected void Application_Start()
         {
-            WcfHeathCheckRouteExtension.AddWcfHealthCheck() // Adiciona a rota de HealthCheck
+            WcfHealthCheckRouteExtension.AddWcfHealthCheck() // Adiciona a rota de HealthCheck
                 .AddCheck("MyApi", new WcfHealthCheck()) // Faz o setup para o HealthCheck WCF
                 .AddCheck("SqlServer",
                             new SqlServerHealthCheck(

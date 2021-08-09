@@ -20,12 +20,16 @@ variables:
   mongo_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.MongoDb'
   rabbitmq_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.RabbitMq'
   sqlserver_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.SqlServer'
+  wcf_healthcheck_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.Wcf'
+  httpclient_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.HttpClient'
 
   project_path: 'src/AspNetStandard.Diagnostics.HealthChecks/AspNetStandard.Diagnostics.HealthChecks.csproj'
   redis_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Redis/AspNetStandard.Diagnostics.HealthChecks.Redis.csproj'
   mongo_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.MongoDb/AspNetStandard.Diagnostics.HealthChecks.MongoDb.csproj'
   rabbitmq_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.RabbitMq/AspNetStandard.Diagnostics.HealthChecks.RabbitMq.csproj'
   sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
+  wcf_healthcheck_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Wcf/AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj'
+  httpclient_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.HttpClient/AspNetStandard.Diagnostics.HealthChecks.HttpClient.csproj'
 
   execute_sonarcloud: 'true'
   sonarcloud_project: 'AndrePostiga_AspNetStandard.Diagnostics.HealthChecks'

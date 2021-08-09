@@ -1,4 +1,5 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
+using AspNetStandard.Diagnostics.HealthChecksWcf.WcfException;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -36,7 +37,9 @@ namespace AspNetStandard.Diagnostics.HealthChecksWcf.Entities
 
         public void GenerateWcfResult(string key, HealthCheckResult result)
         {
-            HealthChecks.Add(key, new WcfHealthCheckResult() { Status = result.Status.ToString(), Description = result.Description, Exception = result.Exception });
+
+            HealthChecks.Add(key, new WcfHealthCheckResult() { Status = result.Status.ToString(), Description = result.Description, Exception = new WcfExceptionHandler(result.Exception).Handler() });
+        
         }
     }
 }
