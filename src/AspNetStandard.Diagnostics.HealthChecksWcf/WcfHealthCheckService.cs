@@ -1,4 +1,6 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecksWcf.Entities;
+using System;
+using System.Data.SqlClient;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Web;

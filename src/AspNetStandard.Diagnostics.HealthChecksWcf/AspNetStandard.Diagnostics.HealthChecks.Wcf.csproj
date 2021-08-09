@@ -9,7 +9,6 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AspNetStandard.Diagnostics.HealthChecksWcf</RootNamespace>
     <AssemblyName>AspNetStandard.Diagnostics.HealthChecksWcf</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -50,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\WcfHealthCheckResponse.cs" />
+    <Compile Include="WcfExceptionHandler\WcfExceptionHandler.cs" />
     <Compile Include="WcfHealthCheckService.cs" />
     <Compile Include="WcfHealthCheckBuilder.cs" />
     <Compile Include="WcfHealthCheck.cs" />
