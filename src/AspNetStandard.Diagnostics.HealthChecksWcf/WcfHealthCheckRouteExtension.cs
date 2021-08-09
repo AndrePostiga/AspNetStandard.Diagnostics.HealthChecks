@@ -4,7 +4,6 @@ using System.Web.Routing;
 namespace AspNetStandard.Diagnostics.HealthChecksWcf
 {
     public static class WcfHealthCheckRouteExtension
-
     {
         public static WcfHealthCheckBuilder AddWcfHealthCheck(string healthEndpoint = "health/")
         {

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
+	</PropertyGroup>
+
+	<ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
+		<ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
+		<ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
+	</ItemGroup>
+
+</Project>
