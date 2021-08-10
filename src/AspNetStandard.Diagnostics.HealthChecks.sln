@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetStandard.Diagnostics.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetStandard.Diagnostics.HealthChecks.Wcf", "AspNetStandard.Diagnostics.HealthChecksWcf\AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj", "{AF8C3310-CE48-4E58-BD45-D053A5BD82E7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetStandard.Diagnostics.HealthChecks.HttpClient", "AspNetStandard.Diagnostics.HealthChecks.Http\AspNetStandard.Diagnostics.HealthChecks.HttpClient.csproj", "{E9B39AC9-D9EB-461D-950F-24988F4BF3A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetStandard.Diagnostics.HealthChecks.HttpClient", "AspNetStandard.Diagnostics.HealthChecks.HttpClient\AspNetStandard.Diagnostics.HealthChecks.HttpClient.csproj", "{FB3BE951-FC91-4500-9914-407A5D023103}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +53,10 @@ Global
 		{AF8C3310-CE48-4E58-BD45-D053A5BD82E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF8C3310-CE48-4E58-BD45-D053A5BD82E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF8C3310-CE48-4E58-BD45-D053A5BD82E7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E9B39AC9-D9EB-461D-950F-24988F4BF3A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E9B39AC9-D9EB-461D-950F-24988F4BF3A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E9B39AC9-D9EB-461D-950F-24988F4BF3A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E9B39AC9-D9EB-461D-950F-24988F4BF3A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB3BE951-FC91-4500-9914-407A5D023103}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB3BE951-FC91-4500-9914-407A5D023103}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB3BE951-FC91-4500-9914-407A5D023103}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB3BE951-FC91-4500-9914-407A5D023103}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,15 +1,14 @@
 ﻿using AspNetStandard.Diagnostics.HealthChecks.Entities;
-using System;
-using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Http = System.Net.Http;
 
-namespace AspNetStandard.Diagnostics.HealthChecks.Http
+namespace AspNetStandard.Diagnostics.HealthChecks.HttpClient
 {
     public class HttpClientHealthCheck : IHealthCheck
     {
-        static readonly HttpClient client = new HttpClient();
-        private string _endpoint;
+        private readonly string _endpoint;
+        private readonly Http.HttpClient client = new Http.HttpClient();
 
         public HttpClientHealthCheck(string endpoint)
         {
@@ -20,16 +19,14 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Http
         {
             try
             {
-                HttpResponseMessage response = await client.GetAsync(_endpoint);
+                Http.HttpResponseMessage response = await client.GetAsync(_endpoint);
                 response.EnsureSuccessStatusCode();
 
                 return new HealthCheckResult(HealthStatus.Healthy, "The Api is Healthy");
-
             }
-            catch (HttpRequestException ex)
+            catch (Http.HttpRequestException ex)
             {
                 return new HealthCheckResult(HealthStatus.Unhealthy, "The Api is Unhealthy", ex);
-
             }
         }
     }
