@@ -22,5 +22,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks
         internal Type Type { get; set; }
 
         internal bool IsSingleton { get; }
+
+        internal bool Teste = false;
     }
 }
