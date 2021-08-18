@@ -20,12 +20,14 @@ variables:
   mongo_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.MongoDb'
   rabbitmq_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.RabbitMq'
   sqlserver_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.SqlServer'
+  azureblobstorage_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.AzureStorage'
 
   project_path: 'src/AspNetStandard.Diagnostics.HealthChecks/AspNetStandard.Diagnostics.HealthChecks.csproj'
   redis_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Redis/AspNetStandard.Diagnostics.HealthChecks.Redis.csproj'
   mongo_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.MongoDb/AspNetStandard.Diagnostics.HealthChecks.MongoDb.csproj'
   rabbitmq_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.RabbitMq/AspNetStandard.Diagnostics.HealthChecks.RabbitMq.csproj'
   sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
+  azureblobstorage_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.AzureStorage/AspNetStandard.Diagnostics.HealthChecks.AzureStorage.csproj'
 
   execute_sonarcloud: 'true'
   sonarcloud_project: 'AndrePostiga_AspNetStandard.Diagnostics.HealthChecks'
@@ -107,6 +109,8 @@ stages:
         dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(mongo_extension_name)/bin "$(mongo_extension_path)" -f netstandard2.0
         dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(rabbitmq_extension_name)/bin "$(rabbitmq_extension_path)" -f netstandard2.0
         dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)/bin "$(sqlserver_extension_path)" -f netstandard2.0
+        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(azureblobstorage_extension_name)/bin "$(azureblobstorage_extension_path)" -f netstandard2.0
+
         mkdir artifact
         cp -r $(System.DefaultWorkingDirectory)/binaries artifact/binaries
       displayName: Build Application
@@ -135,6 +139,11 @@ stages:
       inputs:
         path: $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)
         artifact: $(sqlserver_extension_name)
+    - task: PublishPipelineArtifact@1
+      displayName: HealthCheck Azure Blob Storage Extension Lib Artifact
+      inputs:
+        path: $(System.DefaultWorkingDirectory)/binaries/$(azureblobstorage_extension_name)
+        artifact: $(azureblobstorage_extension_name)
   - job: UnitTests
     dependsOn:
     - PreBuild
@@ -178,58 +187,11 @@ stages:
           testResultsFormat: 'XUnit'
           testResultsFiles: '$(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results/result.xunit.xml'
           testRunTitle: 'Collecting Test Results'
-  - job: QA
-    dependsOn: 
-      - PreBuild
-      - Build
-      - UnitTests
-    condition: |
-      and
-      (
-        in(dependencies.PreBuild.result, 'Succeeded'),
-        in(dependencies.Build.result, 'Succeeded', 'Skipped'),
-        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
-        eq(variables['execute_sonarcloud'], 'true')
-      )
-    workspace:
-      clean: all
-    variables:
-      SonarMasterWhenTag: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.SonarMasterWhenTag'] ]
-      OpencoverSonar: $[ dependencies.UnitTests.outputs['UnitTestsTask.OpencoverSonar'] ]
-    steps:
-      - task: DownloadPipelineArtifact@2
-        displayName: Get Unit Test Result
-        condition: eq(variables['execute_test'], 'true')
-        inputs:
-          artifact: UnitTestResults
-      - task: SonarCloudPrepare@1
-        displayName: Start Sonarqube Analysis
-        inputs:
-          SonarCloud: '$(sonarcloud_account)'
-          organization: '$(sonarcloud_organization)'
-          scannerMode: 'MSBuild'
-          projectKey: '$(sonarcloud_project)'
-          projectName: '$(project_name)'
-          extraProperties: |
-            sonar.sourceEncoding=UTF-8
-            sonar.scm.forceReloadAll=true
-            $(OpencoverSonar)
-            $(SonarMasterWhenTag)
-      - script: |
-          dotnet build "$(solution_path)"
-        displayName: Running Build for QA
-      - task: SonarCloudAnalyze@1
-        displayName: Finish Sonarqube Analysis
-      - task: SonarCloudPublish@1
-        displayName: Publish Sonarqube Analysis
-        inputs:
-          pollingTimeoutSec: '300'
   - job: PackingNuget
     dependsOn:
     - PreBuild
     - Build
     - UnitTests
-    - QA
     workspace:
       clean: all
     condition: |
@@ -238,7 +200,6 @@ stages:
         eq(dependencies.PreBuild.result, 'Succeeded'),
         in(dependencies.Build.result, 'Succeeded', 'Skipped'),
         in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
-        in(dependencies.QA.result, 'Succeeded', 'Skipped'),
         or
         (
           contains(variables['Build.SourceBranch'], '/hotfix/'),
@@ -322,6 +283,7 @@ stages:
             dotnet publish -c Release "$(mongo_extension_path)" -f netstandard2.0
             dotnet publish -c Release "$(rabbitmq_extension_path)" -f netstandard2.0
             dotnet publish -c Release "$(sqlserver_extension_path)" -f netstandard2.0
+            dotnet publish -c Release "$(azureblobstorage_extension_path)" -f netstandard2.0
         displayName: Running Build for Packing    
       - task: DotNetCoreCLI@2
         displayName: 'Packing redisExtension Release'
@@ -374,6 +336,19 @@ stages:
         inputs:
           path: $(Build.ArtifactStagingDirectory)
           artifact: sqlserverPackage
+
+      - task: DotNetCoreCLI@2
+        displayName: 'Packing azureBlobStorageExtension Release'
+        inputs:
+          command: 'custom'
+          projects: '$(azureBlobStorage_extension_path)'
+          custom: 'pack'
+          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
+      - task: PublishPipelineArtifact@1
+        displayName: Store azureBlobStorageExtension Packages
+        inputs:
+          path: $(Build.ArtifactStagingDirectory)
+          artifact: azureBlobStoragePackage
 
 - stage: PublishExtensions
   dependsOn: PackExtensions
@@ -445,5 +420,19 @@ stages:
         custom: nuget
         arguments: >
           push $(Pipeline.Workspace)/$(sqlserver_extension_name).$(Build.BuildNumber).nupkg
+          -s $(NugetPushUrl)
+          -k $(NugetApiKey)
+
+    - task: DownloadPipelineArtifact@2
+      displayName: Get azureBlobStoragePackage Artifact
+      inputs:
+        artifact: azureBlobStoragePackage
+    - task: DotNetCoreCLI@2
+      displayName: Publish azureBlobStoragePackage on nuget.org
+      inputs:
+        command: custom
+        custom: nuget
+        arguments: >
+          push $(Pipeline.Workspace)/$(azureBlobStorage_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
