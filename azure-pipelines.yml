@@ -30,7 +30,7 @@ variables:
   rabbitmq_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.RabbitMq/AspNetStandard.Diagnostics.HealthChecks.RabbitMq.csproj'
   sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
   azureblobstorage_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.AzureStorage/AspNetStandard.Diagnostics.HealthChecks.AzureStorage.csproj'
-  wcf_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Wcf/AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj'
+  wcf_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecksWcf/AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj'
   httpclient_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.HttpClient/AspNetStandard.Diagnostics.HealthChecks.HttpClient.csproj'
 
   execute_sonarcloud: 'true'
@@ -203,11 +203,60 @@ stages:
           testResultsFormat: 'XUnit'
           testResultsFiles: '$(System.DefaultWorkingDirectory)/$(test_project_base_folder)/results/result.xunit.xml'
           testRunTitle: 'Collecting Test Results'
+  
+  - job: QA
+    dependsOn: 
+      - PreBuild
+      - Build
+      - UnitTests
+    condition: |
+      and
+      (
+        in(dependencies.PreBuild.result, 'Succeeded'),
+        in(dependencies.Build.result, 'Succeeded', 'Skipped'),
+        in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
+        eq(variables['execute_sonarcloud'], 'true')
+      )
+    workspace:
+      clean: all
+    variables:
+      SonarMasterWhenTag: $[ dependencies.UpdateBuildVersion.outputs['UpdateBuildVersionTask.SonarMasterWhenTag'] ]
+      OpencoverSonar: $[ dependencies.UnitTests.outputs['UnitTestsTask.OpencoverSonar'] ]
+    steps:
+      - task: DownloadPipelineArtifact@2
+        displayName: Get Unit Test Result
+        condition: eq(variables['execute_test'], 'true')
+        inputs:
+          artifact: UnitTestResults
+      - task: SonarCloudPrepare@1
+        displayName: Start Sonarqube Analysis
+        inputs:
+          SonarCloud: '$(sonarcloud_account)'
+          organization: '$(sonarcloud_organization)'
+          scannerMode: 'MSBuild'
+          projectKey: '$(sonarcloud_project)'
+          projectName: '$(project_name)'
+          extraProperties: |
+            sonar.sourceEncoding=UTF-8
+            sonar.scm.forceReloadAll=true
+            $(OpencoverSonar)
+            $(SonarMasterWhenTag)
+      - script: |
+          dotnet build "$(solution_path)"
+        displayName: Running Build for QA
+      - task: SonarCloudAnalyze@1
+        displayName: Finish Sonarqube Analysis
+      - task: SonarCloudPublish@1
+        displayName: Publish Sonarqube Analysis
+        inputs:
+          pollingTimeoutSec: '300'
+
   - job: PackingNuget
     dependsOn:
     - PreBuild
     - Build
     - UnitTests
+    - QA
     workspace:
       clean: all
     condition: |
@@ -216,6 +265,7 @@ stages:
         eq(dependencies.PreBuild.result, 'Succeeded'),
         in(dependencies.Build.result, 'Succeeded', 'Skipped'),
         in(dependencies.UnitTests.result, 'Succeeded', 'Skipped'),
+        in(dependencies.QA.result, 'Succeeded', 'Skipped'),
         or
         (
           contains(variables['Build.SourceBranch'], '/hotfix/'),
