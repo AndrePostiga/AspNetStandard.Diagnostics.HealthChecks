@@ -2,15 +2,13 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AspNetStandard.Diagnostics.HealthChecksWcf
+namespace AspNetStandard.Diagnostics.HealthChecks.Wfc
 {
-    public class WcfHealthCheck : IHealthCheck
+    public sealed class WcfHealthCheck : IHealthCheck
     {
         public Task<HealthCheckResult> CheckHealthAsync(CancellationToken cancellationToken = default)
         {
-            return Task.Run(() => {
-               return new HealthCheckResult(HealthStatus.Healthy, "The Api is Healthy");
-            });
+            return Task.Run(() => new HealthCheckResult(HealthStatus.Healthy, "The Api is Healthy"));
         }
     }
 }
