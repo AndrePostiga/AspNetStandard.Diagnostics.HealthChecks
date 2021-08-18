@@ -30,7 +30,7 @@ variables:
   rabbitmq_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.RabbitMq/AspNetStandard.Diagnostics.HealthChecks.RabbitMq.csproj'
   sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
   azureblobstorage_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.AzureStorage/AspNetStandard.Diagnostics.HealthChecks.AzureStorage.csproj'
-  wcf_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecksWcf/AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj'
+  wcf_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Wcf/AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj'
   httpclient_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.HttpClient/AspNetStandard.Diagnostics.HealthChecks.HttpClient.csproj'
 
   execute_sonarcloud: 'true'
