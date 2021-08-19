@@ -22,7 +22,7 @@ namespace AspNetStandard.Diagnostics.HealthChecks.AzureStorage
             try
             {
                 var blobServiceClient = new BlobServiceClient(_connectionString);
-                var serviceProperties = await blobServiceClient.GetPropertiesAsync(cancellationToken);
+                await blobServiceClient.GetPropertiesAsync(cancellationToken);
 
                 if (!string.IsNullOrWhiteSpace(_containerName))
                 {
