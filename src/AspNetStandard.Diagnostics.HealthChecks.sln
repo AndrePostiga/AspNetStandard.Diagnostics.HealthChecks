@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetStandard.Diagnostics.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetStandard.Diagnostics.HealthChecks.HttpClient", "AspNetStandard.Diagnostics.HealthChecks.HttpClient\AspNetStandard.Diagnostics.HealthChecks.HttpClient.csproj", "{FB3BE951-FC91-4500-9914-407A5D023103}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage", "AspNetStandard.Diagnostics.HealthChecks.AzureStorage\AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage.csproj", "{267EB7AC-E735-4126-B988-73F61A042B60}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage", "AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage\AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage.csproj", "{267EB7AC-E735-4126-B988-73F61A042B60}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspNetStandard.Diagnostics.HealthChecks.Wcf", "AspNetStandard.Diagnostics.HealthChecks.Wcf\AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj", "{7E791A8B-07B6-49C0-A892-D16FE8CC5059}"
 EndProject
