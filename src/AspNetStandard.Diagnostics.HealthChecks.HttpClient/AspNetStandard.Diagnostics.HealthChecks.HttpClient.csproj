@@ -2,18 +2,29 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net461;net472</TargetFrameworks>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Version>1.0.0</Version>
+		<PackageProjectUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/AndrePostiga/AspNetStandard.Diagnostics.HealthChecks</RepositoryUrl>
+		<Description>Project based on Kirill's and Kpol's project. Original project avaiable on GitHub Link: (https://github.com/kpol/WebApi.HealthChecks) and my new version: (https://github.com/AndrePostiga/WebApi.HealthChecks)</Description>
+		<RepositoryType>Git</RepositoryType>
+		<PackageTags>web, web-api, health, health-check, aspnet-standard</PackageTags>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<Title>AspNetStandard.Diagnostics.HealthChecks.HttpClient</Title>
+		<Description>WebApi extension of the health check for HttpClient health reporting.</Description>
+		<FileVersion>1.0.0.0</FileVersion>
+		<AssemblyName>AspNetStandard.Diagnostics.HealthChecks.HttpClient</AssemblyName>
+		<RootNamespace>AspNetStandard.Diagnostics.HealthChecks.HttpClient</RootNamespace>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
-	<ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
-		<ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
-	</ItemGroup>
 
 	<ItemGroup Condition="$(TargetFramework.StartsWith('net4')) AND '$(MSBuildRuntimeType)' == 'Core' AND '$(OS)' != 'Windows_NT'">
-		<ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
+		<PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
+	  <PackageReference Include="AspNetStandard.Diagnostics.HealthChecks" Version="1.2.0" />
 	</ItemGroup>
 
 </Project>
