@@ -452,6 +452,7 @@ stages:
           push $(Pipeline.Workspace)/$(redis_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+          --skip-duplicate
 
     - task: DownloadPipelineArtifact@2
       displayName: Get mongoPackage Artifact
@@ -466,6 +467,7 @@ stages:
           push $(Pipeline.Workspace)/$(mongo_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+          --skip-duplicate
   
     - task: DownloadPipelineArtifact@2
       displayName: Get rabbitmqPackage Artifact
@@ -480,6 +482,7 @@ stages:
           push $(Pipeline.Workspace)/$(rabbitmq_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+          --skip-duplicate
 
     - task: DownloadPipelineArtifact@2
       displayName: Get sqlserverPackage Artifact
@@ -494,6 +497,7 @@ stages:
           push $(Pipeline.Workspace)/$(sqlserver_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+          --skip-duplicate
 
     - task: DownloadPipelineArtifact@2
       displayName: Get azureBlobStoragePackage Artifact
@@ -508,6 +512,7 @@ stages:
           push $(Pipeline.Workspace)/$(azureBlobStorage_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+          --skip-duplicate
 
     - task: DownloadPipelineArtifact@2
       displayName: Get httpClientPackage Artifact
@@ -522,3 +527,4 @@ stages:
           push $(Pipeline.Workspace)/$(httpclient_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
+          --skip-duplicate
