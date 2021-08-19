@@ -25,6 +25,7 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks.Wcf\AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj" />
     <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
   </ItemGroup>
 

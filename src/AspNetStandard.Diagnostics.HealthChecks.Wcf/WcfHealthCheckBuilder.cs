@@ -11,5 +11,12 @@ namespace AspNetStandard.Diagnostics.HealthChecks.Wfc
 
             return this;
         }
+
+        public WcfHealthCheckBuilder ClearHealthChecks()
+        {
+            WcfHealthCheckConfiguration.HealthChecksDependencies.Clear();
+            
+            return this;
+        }
     }
 }
