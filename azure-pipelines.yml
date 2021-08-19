@@ -20,8 +20,7 @@ variables:
   mongo_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.MongoDb'
   rabbitmq_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.RabbitMq'
   sqlserver_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.SqlServer'
-  azureblobstorage_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.AzureStorage'
-  wcf_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.Wcf'
+  azureblobstorage_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage'
   httpclient_extension_name: 'AspNetStandard.Diagnostics.HealthChecks.HttpClient'
 
   project_path: 'src/AspNetStandard.Diagnostics.HealthChecks/AspNetStandard.Diagnostics.HealthChecks.csproj'
@@ -29,8 +28,7 @@ variables:
   mongo_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.MongoDb/AspNetStandard.Diagnostics.HealthChecks.MongoDb.csproj'
   rabbitmq_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.RabbitMq/AspNetStandard.Diagnostics.HealthChecks.RabbitMq.csproj'
   sqlserver_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.SqlServer/AspNetStandard.Diagnostics.HealthChecks.SqlServer.csproj'
-  azureblobstorage_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.AzureStorage/AspNetStandard.Diagnostics.HealthChecks.AzureStorage.csproj'
-  wcf_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.Wcf/AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj'
+  azureblobstorage_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage/AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage.csproj'
   httpclient_extension_path: 'src/AspNetStandard.Diagnostics.HealthChecks.HttpClient/AspNetStandard.Diagnostics.HealthChecks.HttpClient.csproj'
 
   execute_sonarcloud: 'true'
@@ -114,7 +112,6 @@ stages:
         dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(rabbitmq_extension_name)/bin "$(rabbitmq_extension_path)" -f netstandard2.0
         dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(sqlserver_extension_name)/bin "$(sqlserver_extension_path)" -f netstandard2.0
         dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(azureblobstorage_extension_name)/bin "$(azureblobstorage_extension_path)" -f netstandard2.0
-        dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(wcf_extension_name)/bin "$(wcf_extension_path)" -f netstandard2.0
         dotnet publish -c Release -o $(System.DefaultWorkingDirectory)/binaries/$(httpclient_extension_name)/bin "$(httpclient_extension_path)" -f netstandard2.0
 
         mkdir artifact
@@ -149,12 +146,7 @@ stages:
       displayName: HealthCheck Azure Blob Storage Extension Lib Artifact
       inputs:
         path: $(System.DefaultWorkingDirectory)/binaries/$(azureblobstorage_extension_name)
-        artifact: $(azureblobstorage_extension_name)
-    - task: PublishPipelineArtifact@1
-      displayName: HealthCheck Wcf Extension Lib Artifact
-      inputs:
-        path: $(System.DefaultWorkingDirectory)/binaries/$(wcf_extension_name)
-        artifact: $(wcf_extension_name)
+        artifact: $(azureblobstorage_extension_name)   
     - task: PublishPipelineArtifact@1
       displayName: HealthCheck Http Client Extension Lib Artifact
       inputs:
@@ -350,7 +342,6 @@ stages:
             dotnet publish -c Release "$(rabbitmq_extension_path)" -f netstandard2.0
             dotnet publish -c Release "$(sqlserver_extension_path)" -f netstandard2.0
             dotnet publish -c Release "$(azureblobstorage_extension_path)" -f netstandard2.0
-            dotnet publish -c Release "$(wcf_extension_path)" -f netstandard2.0
             dotnet publish -c Release "$(httpclient_extension_path)" -f netstandard2.0
         displayName: Running Build for Packing    
       - task: DotNetCoreCLI@2
@@ -417,19 +408,6 @@ stages:
         inputs:
           path: $(Build.ArtifactStagingDirectory)
           artifact: azureBlobStoragePackage
-
-      - task: DotNetCoreCLI@2
-        displayName: 'Packing wcfExtension Release'
-        inputs:
-          command: 'custom'
-          projects: '$(wcf_extension_path)'
-          custom: 'pack'
-          arguments: '-p:Configuration=Release -p:PackageVersion=$(ReleaseVersion) -p:Version=$(PureVersion) --output $(Build.ArtifactStagingDirectory)'
-      - task: PublishPipelineArtifact@1
-        displayName: Store wcfExtension Packages
-        inputs:
-          path: $(Build.ArtifactStagingDirectory)
-          artifact: wcfPackage
 
       - task: DotNetCoreCLI@2
         displayName: 'Packing httpClientExtension Release'
@@ -528,20 +506,6 @@ stages:
         custom: nuget
         arguments: >
           push $(Pipeline.Workspace)/$(azureBlobStorage_extension_name).$(Build.BuildNumber).nupkg
-          -s $(NugetPushUrl)
-          -k $(NugetApiKey)
-
-    - task: DownloadPipelineArtifact@2
-      displayName: Get wcfPackage Artifact
-      inputs:
-        artifact: wcfPackage
-    - task: DotNetCoreCLI@2
-      displayName: Publish wcfPackage on nuget.org
-      inputs:
-        command: custom
-        custom: nuget
-        arguments: >
-          push $(Pipeline.Workspace)/$(wcf_extension_name).$(Build.BuildNumber).nupkg
           -s $(NugetPushUrl)
           -k $(NugetApiKey)
 

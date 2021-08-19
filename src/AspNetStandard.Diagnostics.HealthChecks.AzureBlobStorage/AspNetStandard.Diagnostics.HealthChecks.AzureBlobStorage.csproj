@@ -10,11 +10,11 @@
 		<RepositoryType>Git</RepositoryType>
 		<PackageTags>web, web-api, health, health-check, aspnet-standard</PackageTags>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
-		<Title>AspNetStandard.Diagnostics.HealthChecks.AzureStorage</Title>
+		<Title>AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage</Title>
 		<Description>WebApi extension of the health check for AzureBlobStorage health reporting.</Description>
 		<FileVersion>1.0.0.0</FileVersion>
-		<AssemblyName>AspNetStandard.Diagnostics.HealthChecks.AzureStorage</AssemblyName>
-		<RootNamespace>AspNetStandard.Diagnostics.HealthChecks.AzureStorage</RootNamespace>
+		<AssemblyName>AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage</AssemblyName>
+		<RootNamespace>AspNetStandard.Diagnostics.HealthChecks.AzureBlobStorage</RootNamespace>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 
