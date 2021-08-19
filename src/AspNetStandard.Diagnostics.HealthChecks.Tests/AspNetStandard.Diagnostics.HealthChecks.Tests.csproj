@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-
+	<TargetFramework>net5.0</TargetFramework>
+  
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -25,6 +25,7 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks.Wcf\AspNetStandard.Diagnostics.HealthChecks.Wcf.csproj" />
     <ProjectReference Include="..\AspNetStandard.Diagnostics.HealthChecks\AspNetStandard.Diagnostics.HealthChecks.csproj" />
   </ItemGroup>
 
